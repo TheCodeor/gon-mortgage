@@ -35,7 +35,11 @@ const routes = [
       component: () => import("@/views/crossChain"),
    },
  
-
+   {
+      path: "/withdrawConvert",
+      name: "withdrawConvert",
+      component: () => import("@/views/withdrawConvert"),
+   },
 ];
 
 
