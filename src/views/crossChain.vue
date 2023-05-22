@@ -191,7 +191,7 @@ padding-left: 10%;
   }
   .nftlist{
       width: 100%;
-   
+      margin-bottom: 135px;
       .left{
           width: 74%;
           height: 598px;
