@@ -14,6 +14,7 @@
 let tip_idx = 0;
 
 export default {
+    // eslint-disable-next-line vue/multi-word-component-names
     name: 'Popup',
     data() {
         return {
