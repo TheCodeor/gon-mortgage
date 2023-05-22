@@ -40,7 +40,11 @@ const routes = [
       component: () => import("@/views/redemption"),
    },
  
-
+   {
+      path: "/withdrawConvert",
+      name: "withdrawConvert",
+      component: () => import("@/views/withdrawConvert"),
+   },
 ];
 
 
