@@ -19,13 +19,13 @@
     </div>
     <div class="nftlist d-flex flex-row mt-5">
         <div class="left" >
-            <div class="listItem d-flex  flex-column mt-4" v-for="(item,index) in NftList" :key="index">
+            <div class="listItem d-flex  flex-column " v-for="(item,index) in NftList" :key="index">
                 <div class="d-flex flex-row  align-center  ">
                  <img class="img ml-5 " :src="item.src" alt="">
                 <div class="Nftname ml-4">Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!</div>
                 </div>
    
-                 <div class="line mt-4 mb-4"></div>
+                 <div class="line mt-4"></div>
             </div>
            
         </div>
@@ -196,8 +196,11 @@ padding-left: 10%;
           width: 74%;
           height: 598px;
           overflow-y: auto;
-    
+         
           .listItem{
+             &:hover{
+               background: #1d0952;
+             }
                      .line{
               width: 100%;
               height: 1px;
@@ -208,6 +211,7 @@ padding-left: 10%;
                   width: 81px;
                     height: 81px;
                     object-fit: cover;
+                    margin-top: 16px;
               }
               .Nftname{
                   font-family: "MuseoModerno-Regular";
