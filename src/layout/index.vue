@@ -44,7 +44,7 @@
 }
    
 .content{
-     margin: 100px auto 0;
+     margin: 50px auto 0;
         padding: 0;
         width: calc(100% - 40px);
         min-height: 550px;

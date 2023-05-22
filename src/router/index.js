@@ -34,6 +34,11 @@ const routes = [
       name: "crossChain",
       component: () => import("@/views/crossChain"),
    },
+   {
+      path: "/redemption",
+      name: "redemption",
+      component: () => import("@/views/redemption"),
+   },
  
 
 ];
