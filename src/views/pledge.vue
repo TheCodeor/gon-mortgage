@@ -54,7 +54,7 @@
       </div>
       <div class="right">
         <div class="contant d-flex flex-column">
-          <div class="title">Redeem</div>
+          <div class="title">Mortgage</div>
           <div class="baseInfo d-flex flex-row align-center">
             <img
               src="https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small"
@@ -65,12 +65,16 @@
           </div>
           <div class="title-14 mt-5">Current Appraised Value :</div>
           <div class="price">100 UPTICK</div>
-          <div class="title-14 mt-5">Mortgage amount :</div>
-          <div class="price">100 UPTICK</div>
           <div class="title-14 mt-5">Mortgage Period :</div>
-          <div class="title-13 mt-3">
-            2023.5.15 ~ 2023.6.14 18:00:00 30 Days
+          <div class="selectList" @click="showList">
+              <div class="date">7 Days</div>
+              <img src="@/assets/icon_u.png" class="icon" alt="">
+               <div class="list" v-if="isShow">
+                <div class="dayName">7 Days</div>
+                <div class="dayName">14 Days</div>
           </div>
+          </div>
+         
           <div class="Ransom mt-5">
             <div class="content">
               <div class="details">
@@ -102,10 +106,11 @@
   <script>
 import Select from "../components/Select/index";
 export default {
-  name: "redemption",
+  name: "pledge",
   components: { Select },
   data() {
     return {
+        isShow:false,
       NftList: [
         {
           src:
@@ -156,7 +161,11 @@ export default {
   },
   filters: {},
   async mounted() {},
-  methods: {},
+  methods: {
+      showList(){
+          this.isShow = !this.isShow
+      }
+  },
 };
 </script>
   <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -367,6 +376,48 @@ export default {
       line-height: 16px;
       letter-spacing: 0px;
       color: #54df62;
+    }
+    .selectList{
+        position: relative;
+        height: 41px;
+	background-color: #351e82;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    .icon{
+        position: absolute;
+        right: 10px;
+        width: 12px;
+	height: 6px;
+        }
+    .date{
+        font-family: "MuseoModerno-SemiBold";
+        font-size: 14px;
+        font-weight: normal;
+        font-stretch: normal;
+        line-height: 20px;
+        letter-spacing: 0px;
+        color: #ffffff;
+        padding-left: 12px;
+    }
+    }
+    .list{
+        padding:16px 0 0 12px;
+        position: absolute;
+        top: 45px;
+        width: 100%;
+        height: 81px;
+        background-color: #351e82;
+        border-radius: 5px;
+    .dayName{
+        	font-family: "MuseoModerno-SemiBold";
+            font-size: 14px;
+            font-weight: normal;
+            font-stretch: normal;
+            line-height: 21px;
+            letter-spacing: 0px;
+            color: #ffffff;
+    }
     }
     .contant {
       margin: 18px 28px 0 25px;

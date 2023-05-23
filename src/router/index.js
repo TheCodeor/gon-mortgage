@@ -45,6 +45,12 @@ const routes = [
       name: "withdrawConvert",
       component: () => import("@/views/withdrawConvert"),
    },
+   
+   {
+      path: "/pledge",
+      name: "pledge",
+      component: () => import("@/views/pledge"),
+   },
 ];
 
 
