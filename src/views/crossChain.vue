@@ -24,12 +24,12 @@
           class="listItem d-flex flex-column"
           v-for="(item, index) in NftList"
           :key="index"
+          @click="itemClick(item)"
         >
           <div class="d-flex flex-row align-center">
-            <img class="img ml-5" :src="item.src" alt="" />
+            <img class="img ml-5" :src="item.imgUrl" alt="" />
             <div class="Nftname ml-4">
-              Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!Wake up,
-              Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!
+             {{item.name}}
             </div>
           </div>
 
@@ -40,11 +40,11 @@
         <div class="contant d-flex flex-column">
           <div class="baseInfo d-flex flex-row align-center">
             <img
-              src="https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small"
+              :src="crossSrc"
               class="ava"
               alt=""
             />
-            <div class="nftname ml-4">Wake up, Astro Boy!</div>
+            <div class="nftname ml-4">{{crossName}}</div>
           </div>
           <div class="crossItem mt-7 d-flex flex-row align-center">
             <div class="From ml-5">From</div>
@@ -85,6 +85,8 @@
   <script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
+import { getMyCardList} from "@/api/home";
+import { getNftImg } from "/src/api/image";
 export default {
   name: "crossChain",
   components: { Select },
@@ -92,53 +94,34 @@ export default {
     return {
       userName: "",
       NftList: [
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
+       
       ],
+      crossName:'',
+      crossSrc:''
     };
   },
   filters: {},
   async mounted() {
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
+     this.getMyList();
   },
   methods: {
-    ChainChange(chain) {
-      console.log("ChainChange", chain);
+     async  getMyList(){
+     let params = {
+        owner:this.$store.state.IrisAddress,
+        chainType: 'gon-irishub-1',
+     }
+     let listInfo = await getMyCardList(params);
+      let list = listInfo.data.list;
+      this.NftList = this.NftList.concat(list);
+      this.crossSrc =  this.NftList[0].imgUrl
+       this.crossName = this.NftList[0].name
+    },
+    ChainChange(chainId) {
+      console.log("ChainChange", chainId);
+     
+     
     },
     disconnect() {
       localStorage.clear();
@@ -149,6 +132,11 @@ export default {
     submit() {
       this.$router.push({ name: "withdrawConvert" });
     },
+    itemClick(item){
+      console.log("item",item);
+      this.crossName = item.name
+      this.crossSrc= item.imgUrl
+    }
   },
 };
 </script>

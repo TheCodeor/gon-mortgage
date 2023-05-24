@@ -26,10 +26,9 @@
           :key="index"
         >
           <div class="d-flex flex-row align-center">
-            <img class="img ml-5" :src="item.src" alt="" />
+            <img class="img ml-5" :src="item.imgUrl" alt="" />
             <div class="Nftname ml-4">
-              Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!Wake up,
-              Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!
+           {{item.name}}
             </div>
             <div class="withdraw" @click="withdrowButtonClick">
               <div>Withdraw to IRISnet</div>
@@ -50,6 +49,7 @@
 <script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
+import { getMyCardList} from "@/api/home";
 export default {
   name: "crossChain",
   components: { Select },
@@ -57,58 +57,37 @@ export default {
     return {
       userName: "",
       NftList: [
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
+      
       ],
     };
   },
   filters: {},
+  created(){
+    localStorage.setItem("selectChain", "Uptick-COSMOS");
+  },
   async mounted() {
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
+    this.getMyList();
   },
   methods: {
+     async getMyList(){
+     let params = {
+        owner:this.$store.state.UptickAddress,
+        chainType: 'origin_1170-1',
+     }
+     let listInfo = await getMyCardList(params);
+      let list = listInfo.data.list;
+      this.NftList = this.NftList.concat(list);
+   
+    },
     withdrowButtonClick() {
       console.log("withdraw");
     },
     convertButtonClick() {
       console.log("convert");
       // this.router.push({name:'redemption'})
-      this.$router.push({ name: "pledge" });
+      // this.$router.push({ name: "pledge" });
     },
     disconnect() {
       localStorage.clear();
@@ -224,6 +203,7 @@ export default {
       }
 
       .Nftname {
+        width: 55%;
         font-family: "MuseoModerno-Regular";
         font-size: 12px;
         font-weight: normal;
