@@ -250,6 +250,9 @@
   <script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
+import { addNetwork } from "../keplr/contract/handle/base";
+import {getRate  } from "../keplr/contract/handle/Pawnshop";
+
 export default {
   name: "pledge",
   components: { Select },
@@ -316,10 +319,16 @@ export default {
   async mounted() {
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
+   await addNetwork();
+   getRate();
+ 
+   
   },
   methods: {
+
+  
     clickItem(index){
-      this.cli
+   
     },
     Mortgage(item) {
       console.log(item);
