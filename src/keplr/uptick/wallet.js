@@ -17,8 +17,8 @@ import {
 
 const chainId = "origin_1170-1";
 const irisChainId = "gon-irishub-1";
-const uptickUrl = "http://localhost:8080/uptick";
-const irisUrl = "http://localhost:8080/iris";
+const uptickUrl = window.location.protocol+"//"+ window.location.host + "/uptick";
+const irisUrl = window.location.protocol+"//"+ window.location.host + "/iris";
 
 
 
