@@ -4,14 +4,14 @@
     <div class="Title">CreditWise</div>
     <div class="select d-flex flex-row justify-space-between">
       <div>
-        <div class="userName">Sina</div>
+        <div class="userName">{{ userName }}</div>
         <div class="address">
-          iaa0sd72093836jsis7w8ekxd83kw0ddrwd456
-          <button class="btn ml-9">Disconnect</button>
+          {{ $store.state.IrisAddress }}
+          <button class="btn ml-9" @click="disconnect">Disconnect</button>
         </div>
       </div>
       <div class="filter">
-        <Select />
+        <Select @chainChange="ChainChange" />
       </div>
     </div>
     <div class="Form mt-5 d-flex align-center">
@@ -63,7 +63,7 @@
             />
             <div class="chainName ml-4">UptickEVM</div>
           </div>
-          <button class="submit mt-6">Submit</button>
+          <button class="submit mt-6" @click="submit">Submit</button>
           <div class="des mt-7">Currently you are doing cross-chain</div>
           <div class="des">
             operations, and you need to complete the following operations:
@@ -84,11 +84,13 @@
   
   <script>
 import Select from "../components/Select/index";
+import { getIirsAccoutInfo } from "../keplr/iris/wallet";
 export default {
   name: "crossChain",
   components: { Select },
   data() {
     return {
+      userName: "",
       NftList: [
         {
           src:
@@ -130,8 +132,24 @@ export default {
     };
   },
   filters: {},
-  async mounted() {},
-  methods: {},
+  async mounted() {
+    let accountInfo = await getIirsAccoutInfo();
+    this.userName = accountInfo.name;
+  },
+  methods: {
+    ChainChange(chain) {
+      console.log("ChainChange", chain);
+    },
+    disconnect() {
+      localStorage.clear();
+      this.$store.commit("SET_DID", "");
+      this.$store.commit("SET_UPTICK_DID", "");
+      this.$router.push({ name: "Home" });
+    },
+    submit() {
+      this.$router.push({ name: "withdrawConvert" });
+    },
+  },
 };
 </script>
   <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -287,7 +305,6 @@ export default {
         color: #4e1dc7;
       }
       .des {
- 
         font-family: "MuseoModerno-Regular";
         font-size: 12px;
         font-weight: normal;
@@ -297,7 +314,6 @@ export default {
         color: #ffffff;
       }
       .crossItem {
-
         height: 85px;
         background-color: #3d179f;
         border-radius: 5px;
@@ -343,16 +359,16 @@ export default {
   color: #54df62;
 }
 ::-webkit-scrollbar {
-  width: 4px;  /* 设置滚动条宽度 */
+  width: 4px; /* 设置滚动条宽度 */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #611ecd;  /* 设置滚动条的颜色 */
-  border-radius: 2px;  /* 设置滚动条的圆角 */
+  background-color: #611ecd; /* 设置滚动条的颜色 */
+  border-radius: 2px; /* 设置滚动条的圆角 */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #aaa;  /* 设置滚动条的鼠标悬停颜色 */
+  background-color: #aaa; /* 设置滚动条的鼠标悬停颜色 */
 }
 </style>
   

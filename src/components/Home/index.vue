@@ -7,20 +7,25 @@
     <div class="NftList mt-5 d-flex align-center">
       <div class="name">NFTs</div>
     </div>
-    <button class="wallet">Connect Wallet</button>
+    <button class="wallet"  @click="connectWallet">Connect Wallet</button>
 
   </div>
 </template>
 
 <script>
 import Select from "../Select/index";
+import {
+  getkeplrIrisAddress,
+  getkeplrUptickAddress,
+  initWallet,
+} from "../../keplr/index";
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Home',
   components: { Select },
   data() {
     return {
-
+      
     }
 
   },
@@ -29,9 +34,23 @@ export default {
   },
   async mounted() {
 
+    initWallet();
+
 
   },
   methods: {
+        async connectWallet() {
+          
+      // Iris Address
+      let account = await getkeplrIrisAddress();
+      this.$store.commit("SET_DID", account.toLowerCase());
+      // uptick Address
+      let uptickAccount = await getkeplrUptickAddress();
+      this.$store.commit("SET_UPTICK_DID", uptickAccount.toLowerCase());
+      if (account && uptickAccount) {
+        this.$router.push({ name: "crossChain" });
+      }
+    },
 
   },
 

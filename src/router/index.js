@@ -51,6 +51,7 @@ const routes = [
       name: "pledge",
       component: () => import("@/views/pledge"),
    },
+   
 ];
 
 

@@ -4,10 +4,10 @@
     <div class="Title">CreditWise</div>
     <div class="select d-flex flex-row justify-space-between">
       <div>
-        <div class="userName">Sina</div>
+        <div class="userName">{{ userName }}</div>
         <div class="address">
-          iaa0sd72093836jsis7w8ekxd83kw0ddrwd456
-          <button class="btn ml-9">Disconnect</button>
+          {{ $store.state.IrisAddress }}
+          <button class="btn ml-9" @click="disconnect">Disconnect</button>
         </div>
       </div>
       <div class="filter">
@@ -39,7 +39,7 @@
                 Not Mortgaged
               </div>
               <div class="time" :class="{ opacitys: item.state == '3' }">
-                2023.5.15 ~ 2023.6.14 18:00:00 30 Days
+                2023.5.15 ~ 2023.6.14 18:00:00 <br /><span>30 Days</span>
               </div>
               <button
                 class="btn"
@@ -87,80 +87,79 @@
             2023.5.15 ~ 2023.6.14 18:00:00 30 Days
           </div>
 
-          <div v-if=" handType == 'redemption'">
-         <div class="Ransom mt-5">
-            <div class="content">
-              <div class="details">
-                <div class="title">Ransom</div>
-                <div class="Info d-flex flex-row align-center">
-                  <div class="leftItem mt-4">
-                    <div class="Principal">Principal</div>
-                    <div class="prices">70 UPTICK</div>
-                  </div>
+          <div v-if="handType == 'redemption'">
+            <div class="Ransom mt-5">
+              <div class="content">
+                <div class="details">
+                  <div class="title">Ransom</div>
+                  <div class="Info d-flex flex-row align-center">
+                    <div class="leftItem mt-4">
+                      <div class="Principal">Principal</div>
+                      <div class="prices">70 UPTICK</div>
+                    </div>
 
-                  <div class="mt-4 ml-7 mr-7" style="color: #ffffff">+</div>
-                  <div class="leftItem mt-4">
-                    <div class="Principal">Interest</div>
-                    <div class="prices">0.7 UPTICK</div>
+                    <div class="mt-4 ml-7 mr-7" style="color: #ffffff">+</div>
+                    <div class="leftItem mt-4">
+                      <div class="Principal">Interest</div>
+                      <div class="prices">0.7 UPTICK</div>
+                    </div>
+                    <!-- <div class="Interest">Interest</div> -->
                   </div>
-                  <!-- <div class="Interest">Interest</div> -->
+                  <div class="title-25 mt-4">70.7 UPTICK</div>
                 </div>
-                <div class="title-25 mt-4">70.7 UPTICK</div>
               </div>
             </div>
-          </div>
-          <div class="help mt-4" @click="toPage">I want to postpone</div>
-          <button class="submit mt-6">Submit</button>
+            <div class="help mt-4" @click="toPage">I want to postpone</div>
+            <button class="submit mt-6">Submit</button>
           </div>
           <div v-else>
-                <div class="Ransom1 mt-5">
-            <img
-              src="@/assets/icon_i.png"
-              class="IconInfo"
-              @mouseenter="moused()"
-              @mouseleave="leave()"
-              alt=""
-            />
-            <div class="explain" v-if="isShowExplain">
-              <div class="title-12">Mortgage Description:</div>
-              <div class="title-12">
-                1. We have valued this NFT and have shown you the amount that
-                can be mortgaged;<br />
-                2. You can choose to mortgage 7 days or 30 days according to
-                your needs, and pay the corresponding ransom;<br />
-                3. You need to redeem the NFT on time, and could only extend it
-                once with the same time period before the mortgage period
-                ends;<br />
-                4. If you fail to redeem or postpone it before the end of the
-                mortgage period, your NFT will be confiscated.
-              </div>
-            </div>
-            <div class="title1 pt-4">Mortgage Period</div>
-            <div class="title-25 mt-2">70 UPTICK</div>
-            <div class="content">
-              <div class="details">
-                <div class="title1">Ransom</div>
-                <div class="Info d-flex flex-row align-center">
-                  <div class="leftItem mt-2">
-                    <div class="Principal">Principal</div>
-                    <div class="prices">70 UPTICK</div>
-                  </div>
-
-                  <div class="mt-2 ml-7 mr-7" style="color: #ffffff">+</div>
-                  <div class="leftItem mt-2">
-                    <div class="Principal">Interest</div>
-                    <div class="prices">0.7 UPTICK</div>
-                  </div>
-
-                  <!-- <div class="Interest">Interest</div> -->
+            <div class="Ransom1 mt-5">
+              <img
+                src="@/assets/icon_i.png"
+                class="IconInfo"
+                @mouseenter="moused()"
+                @mouseleave="leave()"
+                alt=""
+              />
+              <div class="explain" v-if="isShowExplain">
+                <div class="title-12">Mortgage Description:</div>
+                <div class="title-12">
+                  1. We have valued this NFT and have shown you the amount that
+                  can be mortgaged;<br />
+                  2. You can choose to mortgage 7 days or 30 days according to
+                  your needs, and pay the corresponding ransom;<br />
+                  3. You need to redeem the NFT on time, and could only extend
+                  it once with the same time period before the mortgage period
+                  ends;<br />
+                  4. If you fail to redeem or postpone it before the end of the
+                  mortgage period, your NFT will be confiscated.
                 </div>
-                <div class="title-25 mt-4">70.7 UPTICK</div>
               </div>
+              <div class="title1 pt-4">Mortgage Period</div>
+              <div class="title-25 mt-2">70 UPTICK</div>
+              <div class="content">
+                <div class="details">
+                  <div class="title1">Ransom</div>
+                  <div class="Info d-flex flex-row align-center">
+                    <div class="leftItem mt-2">
+                      <div class="Principal">Principal</div>
+                      <div class="prices">70 UPTICK</div>
+                    </div>
+
+                    <div class="mt-2 ml-7 mr-7" style="color: #ffffff">+</div>
+                    <div class="leftItem mt-2">
+                      <div class="Principal">Interest</div>
+                      <div class="prices">0.7 UPTICK</div>
+                    </div>
+
+                    <!-- <div class="Interest">Interest</div> -->
+                  </div>
+                  <div class="title-25 mt-4">70.7 UPTICK</div>
+                </div>
+              </div>
+              <button class="submit1 mt-6">Submit</button>
             </div>
-            <button class="submit1 mt-6">Submit</button>
           </div>
-          </div>
-        
         </div>
       </div>
     </div>
@@ -169,13 +168,15 @@
   
   <script>
 import Select from "../components/Select/index";
+import { getIirsAccoutInfo } from "../keplr/iris/wallet";
 export default {
   name: "redemption",
   components: { Select },
   data() {
     return {
-        handType:'redemption',
-        isShowExplain:false,
+      handType: "redemption",
+      userName: "",
+      isShowExplain: false,
       NftList: [
         {
           src:
@@ -225,16 +226,26 @@ export default {
     };
   },
   filters: {},
-  async mounted() {},
+  async mounted() {
+    let accountInfo = await getIirsAccoutInfo();
+    this.userName = accountInfo.name;
+  },
   methods: {
-      toPage(){
-          this.handType ='renew'
-      },
-        moused() {
+    toPage() {
+      //  this.$router.push({name:"renewal"})
+      this.handType = "renew";
+    },
+    moused() {
       this.isShowExplain = true;
     },
     leave() {
       this.isShowExplain = false;
+    },
+    disconnect() {
+      localStorage.clear();
+      this.$store.commit("SET_DID", "");
+      this.$store.commit("SET_UPTICK_DID", "");
+      this.$router.push({ name: "Home" });
     },
   },
 };
@@ -250,15 +261,15 @@ export default {
   letter-spacing: 0px;
   color: #54df62;
 }
-.title1{
-    text-align: center;
-    	font-family:"MuseoModerno-SemiBold";
-	font-size: 16px;
-	font-weight: normal;
-	font-stretch: normal;
-	line-height: 20px;
-	letter-spacing: 0px;
-	color: #ffffff;
+.title1 {
+  text-align: center;
+  font-family: "MuseoModerno-SemiBold";
+  font-size: 16px;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: 20px;
+  letter-spacing: 0px;
+  color: #ffffff;
 }
 .select {
   .filter {
@@ -372,7 +383,7 @@ export default {
           font-size: 12px;
           font-weight: normal;
           font-stretch: normal;
-          line-height: 13px;
+          line-height: 18px;
           letter-spacing: 0px;
           color: #ffffff;
         }
@@ -471,8 +482,8 @@ export default {
       .title {
         display: flex;
         justify-content: center;
-        font-family: " MuseoModerno-SemiBold";
-        font-size: 20px;
+        font-family: "MuseoModerno-SemiBold" !important;
+        font-size: 20px !important;
         font-weight: normal;
         font-stretch: normal;
         line-height: 20px;
@@ -497,7 +508,7 @@ export default {
         }
       }
       .submit {
-          width: 100%;
+        width: 100%;
         height: 41px;
         background-color: #4e1dc7;
         border-radius: 20px;
@@ -510,6 +521,7 @@ export default {
         color: #54df62;
       }
       .help {
+        cursor: pointer;
         width: 100%;
         display: flex;
         justify-content: center;
@@ -529,12 +541,12 @@ export default {
         .content {
           padding: 16px 10px;
           height: 122px;
-       
+
           border-radius: 5px;
 
           .details {
             padding: 15px 25px 0px;
-               background-color: #36148e;
+            background-color: #36148e;
 
             .title {
               font-family: "MuseoModerno-SemiBold";
@@ -604,108 +616,108 @@ export default {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #aaa; /* 设置滚动条的鼠标悬停颜色 */
 }
- .Ransom1 {
-        height: 228px;
-        background-color: #4e1dc7;
-        border-radius: 5px;
-        position: relative;
-        .submit1{
-            width: 100%;
-             height: 41px;
-        background-color: #54df62;
-        border-radius: 20px;
+.Ransom1 {
+  height: 228px;
+  background-color: #4e1dc7;
+  border-radius: 5px;
+  position: relative;
+  .submit1 {
+    width: 100%;
+    height: 41px;
+    background-color: #54df62;
+    border-radius: 20px;
+    font-family: "MuseoModerno-SemiBold" !important;
+    font-size: 15px !important;
+    font-weight: normal;
+    font-stretch: normal;
+    line-height: 20px;
+    letter-spacing: 0px;
+    color: #4e1dc7;
+  }
+  .IconInfo {
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
+  .explain {
+    padding: 15px;
+    position: absolute;
+    top: 20px;
+    right: 5px;
+    width: 295px;
+    height: 270px;
+    background-color: #000000;
+    border-radius: 5px;
+    .title-12 {
+      font-family: "MuseoModerno-Regular";
+      font-size: 12px;
+      font-weight: normal;
+      font-stretch: normal;
+      line-height: 20px;
+      letter-spacing: 0px;
+      color: #ffffff;
+    }
+  }
+  .title-25 {
+    width: 100%;
+    text-align: center;
+    font-family: "MuseoModerno-SemiBold";
+    font-size: 25px;
+    font-weight: normal;
+    font-stretch: normal;
+    line-height: 30px;
+    letter-spacing: 0px;
+    color: #54df62;
+  }
+  .content {
+    margin: 16px 10px;
+    height: 122px;
+    background-color: #36148e;
+    border-radius: 5px;
+
+    .details {
+      padding: 10px 25px 5px;
+
+      .title1 {
         font-family: "MuseoModerno-SemiBold" !important;
-        font-size: 15px !important;
+        font-size: 16px !important;
         font-weight: normal;
         font-stretch: normal;
         line-height: 20px;
         letter-spacing: 0px;
-        color: #4e1dc7;
-        }
-        .IconInfo {
-          width: 15px;
-          height: 15px;
-          position: absolute;
-          top: 5px;
-          right: 5px;
-        }
-        .explain {
-          padding: 15px;
-          position: absolute;
-          top: 20px;
-          right: 5px;
-          width: 295px;
-          height: 270px;
-          background-color: #000000;
-          border-radius: 5px;
-          .title-12 {
+        color: #ffffff;
+      }
+      .Info {
+        .leftItem {
+          text-align: center;
+          .Principal {
+            height: 11px;
             font-family: "MuseoModerno-Regular";
-            font-size: 12px;
+            font-size: 10px;
             font-weight: normal;
             font-stretch: normal;
-            line-height: 20px;
+            line-height: 6px;
+            letter-spacing: 0px;
+            color: #af8eff;
+          }
+          .prices {
+            width: 107%;
+            height: 9px;
+            font-family: "MuseoModerno-Regular";
+            font-size: 10px;
+            font-weight: normal;
+            font-stretch: normal;
+            line-height: 14px;
             letter-spacing: 0px;
             color: #ffffff;
           }
         }
-        .title-25 {
-          width: 100%;
-          text-align: center;
-          font-family: "MuseoModerno-SemiBold";
-          font-size: 25px;
-          font-weight: normal;
-          font-stretch: normal;
-          line-height: 30px;
-          letter-spacing: 0px;
-          color: #54df62;
-        }
-        .content {
-          margin: 16px 10px;
-          height: 122px;
-          background-color: #36148e;
-          border-radius: 5px;
-
-          .details {
-            padding: 10px 25px 5px;
-
-            .title1 {
-              font-family: "MuseoModerno-SemiBold" !important;
-              font-size: 16px !important;
-              font-weight: normal;
-              font-stretch: normal;
-              line-height: 20px;
-              letter-spacing: 0px;
-              color: #ffffff;
-            }
-            .Info {
-              .leftItem {
-                text-align: center;
-                .Principal {
-                  height: 11px;
-                  font-family: "MuseoModerno-Regular";
-                  font-size: 10px;
-                  font-weight: normal;
-                  font-stretch: normal;
-                  line-height: 6px;
-                  letter-spacing: 0px;
-                  color: #af8eff;
-                }
-                .prices {
-                  width: 107%;
-                  height: 9px;
-                  font-family: "MuseoModerno-Regular";
-                  font-size: 10px;
-                  font-weight: normal;
-                  font-stretch: normal;
-                  line-height: 14px;
-                  letter-spacing: 0px;
-                  color: #ffffff;
-                }
-              }
-            }
-          }
-        }
       }
+    }
+  }
+}
 </style>
   
       

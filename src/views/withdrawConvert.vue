@@ -4,15 +4,15 @@
     <div class="Title">CreditWise</div>
     <div class="select d-flex flex-row justify-space-between">
       <div>
-        <div class="userName">Sina</div>
-        <div class="address">iaa0sd72093836jsis7w8ekxd83kw0ddrwd456
-          <button class="btn ml-9">Disconnect</button>
+        <div class="userName">{{ userName }}</div>
+        <div class="address">
+          {{ $store.state.IrisAddress }}
+          <button class="btn ml-9" @click="disconnect">Disconnect</button>
         </div>
       </div>
       <div class="filter">
         <Select />
       </div>
-
     </div>
     <div class="Form mt-5 d-flex align-center">
       <div class="name">NFTs</div>
@@ -20,11 +20,17 @@
     </div>
     <div class="nftlist d-flex flex-row mt-5">
       <div class="left">
-        <div class="listItem d-flex  flex-column " v-for="(item, index) in NftList" :key="index">
-          <div class="d-flex flex-row  align-center  ">
-            <img class="img ml-5 " :src="item.src" alt="">
-            <div class="Nftname ml-4">Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!Wake up,
-              Astro Boy!Wake up, Astro Boy!</div>
+        <div
+          class="listItem d-flex flex-column"
+          v-for="(item, index) in NftList"
+          :key="index"
+        >
+          <div class="d-flex flex-row align-center">
+            <img class="img ml-5" :src="item.src" alt="" />
+            <div class="Nftname ml-4">
+              Wake up, Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!Wake up,
+              Astro Boy!Wake up, Astro Boy!Wake up, Astro Boy!
+            </div>
             <div class="withdraw" @click="withdrowButtonClick">
               <div>Withdraw to IRISnet</div>
             </div>
@@ -35,73 +41,83 @@
 
           <div class="line mt-4"></div>
         </div>
-
       </div>
     </div>
     <!-- <button class="wallet">Connect Wallet</button> -->
-
   </div>
 </template>
   
 <script>
 import Select from "../components/Select/index";
+import { getIirsAccoutInfo } from "../keplr/iris/wallet";
 export default {
-  name: 'crossChain',
+  name: "crossChain",
   components: { Select },
   data() {
     return {
+      userName: "",
       NftList: [
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
         },
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
         },
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
         },
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
         },
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
         },
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
         },
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
         },
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
         },
         {
-          src: 'https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small'
-        }
-      ]
-    }
-
+          src:
+            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
+        },
+      ],
+    };
   },
-  filters: {
-
-  },
+  filters: {},
   async mounted() {
-
-
+    let accountInfo = await getIirsAccoutInfo();
+    this.userName = accountInfo.name;
   },
   methods: {
-
     withdrowButtonClick() {
-      console.log("withdraw")
+      console.log("withdraw");
     },
     convertButtonClick() {
-      console.log("convert")
-
+      console.log("convert");
+      // this.router.push({name:'redemption'})
+      this.$router.push({ name: "pledge" });
+    },
+    disconnect() {
+      localStorage.clear();
+      this.$store.commit("SET_DID", "");
+      this.$store.commit("SET_UPTICK_DID", "");
+      this.$router.push({ name: "Home" });
     },
   },
-
-}
-
+};
 </script>
   <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang='scss' scoped>
@@ -159,9 +175,7 @@ export default {
 .Form {
   width: 100%;
   height: 75px;
-  background-image: linear-gradient(90deg,
-      #54e161 0%,
-      #4e1dc7 100%);
+  background-image: linear-gradient(90deg, #54e161 0%, #4e1dc7 100%);
   border-radius: 5px;
   font-family: "MuseoModerno-SemiBold";
   font-size: 17px;
@@ -179,7 +193,6 @@ export default {
   .transfer {
     width: 20%;
   }
-
 }
 
 .nftlist {
@@ -226,7 +239,7 @@ export default {
         height: 33px;
         background-color: #4e1dc7;
         border-radius: 16px;
-        font-family: 'MuseoModerno-SemiBold';
+        font-family: "MuseoModerno-SemiBold";
         font-size: 15px;
         text-align: center;
         font-weight: normal;
@@ -242,7 +255,7 @@ export default {
         height: 33px;
         background-color: #54df62;
         border-radius: 16px;
-        font-family: 'MuseoModerno-SemiBold';
+        font-family: "MuseoModerno-SemiBold";
         font-size: 15px;
         text-align: center;
         font-weight: normal;
@@ -251,7 +264,6 @@ export default {
         letter-spacing: 0px;
         color: #611ecd;
         margin-right: 20px;
-
       }
     }
   }

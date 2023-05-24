@@ -1,12 +1,12 @@
 <template>
 <div class="Select ">
-   <button class="filter" @click="isShow">IRISnet 
+   <button class="filter" @click="isShow">{{selectChainName}} 
      <img class="icon" src="@/assets/icon_d.png" v-if="!isshow" alt="">
       <img class="icon" src="@/assets/icon_u.png" v-else alt="">
    </button>
    <div class="list" v-if="isshow">
        <div class="listItem" v-for="(item,index) in list" :key="index">
-           <div class="name">{{item.chainNmme}}</div>
+           <div class="name" @click="clickItem(item.chainNmme)">{{item.chainNmme}}</div>
        </div>
    </div>
 </div>
@@ -22,9 +22,10 @@ export default {
   components:{},
   data(){
     return{
+        selectChainName:'IRISnet',
       list:[
           {
-             chainNmme:"IRISnet" 
+             chainNmme:"IRISnet"
           },
           {
              chainNmme:"Uptick-COSMOS" 
@@ -47,6 +48,12 @@ export default {
   methods:{
       isShow(){
           this.isshow = !this.isshow
+      },
+      clickItem(chainName){
+            this.$store.commit("SET_CHAIN", chainName);
+            this.isshow = false
+            this.selectChainName = chainName
+            this.$emit('chainChange',chainName)
       }
     },
  
@@ -61,17 +68,17 @@ export default {
 .Select{
     position: relative;
     .filter{
-        width: 126px;
+        width: 145px;
         height: 41px;
         background-color: #4e1dc7;
         border-radius: 20px;
         font-family: "MuseoModerno-SemiBold";
-	font-size: 15px;
-	font-weight: normal;
-	font-stretch: normal;
-	line-height: 20px;
-	letter-spacing: 0px;
-    color: #54df62;
+        font-size: 15px;
+        font-weight: normal;
+        font-stretch: normal;
+        line-height: 20px;
+        letter-spacing: 0px;
+        color: #54df62;
     .icon{
          width: 12px;
          height: 9px;
@@ -87,6 +94,7 @@ export default {
         .listItem{
             margin: 15px;
             .name{
+                cursor: pointer;
                 font-family: "MuseoModerno-SemiBold";
                 font-size: 14px;
                 font-weight: normal;
