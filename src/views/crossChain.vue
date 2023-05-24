@@ -20,16 +20,11 @@
     </div>
     <div class="nftlist d-flex flex-row mt-5">
       <div class="left">
-        <div
-          class="listItem d-flex flex-column"
-          v-for="(item, index) in NftList"
-          :key="index"
-          @click="itemClick(item)"
-        >
+        <div class="listItem d-flex flex-column" v-for="(item, index) in NftList" :key="index" @click="itemClick(item)">
           <div class="d-flex flex-row align-center">
             <img class="img ml-5" :src="item.imgUrl" alt="" />
             <div class="Nftname ml-4">
-             {{item.name}}
+              {{ item.name }}
             </div>
           </div>
 
@@ -39,12 +34,8 @@
       <div class="right">
         <div class="contant d-flex flex-column">
           <div class="baseInfo d-flex flex-row align-center">
-            <img
-              :src="crossSrc"
-              class="ava"
-              alt=""
-            />
-            <div class="nftname ml-4">{{crossName}}</div>
+            <img :src="crossSrc" class="ava" alt="" />
+            <div class="nftname ml-4">{{ crossName }}</div>
           </div>
           <div class="crossItem mt-7 d-flex flex-row align-center">
             <div class="From ml-5">From</div>
@@ -56,14 +47,10 @@
           </div>
           <div class="crossItem mt-3 d-flex flex-row align-center">
             <div class="From ml-8">To</div>
-            <img
-              src="@/assets/icon_upticknetwork.png"
-              class="Iris ml-9"
-              alt=""
-            />
+            <img src="@/assets/icon_upticknetwork.png" class="Iris ml-9" alt="" />
             <div class="chainName ml-4">UptickEVM</div>
           </div>
-          <button class="submit mt-6" @click="submit">Submit</button>
+          <button class="submit mt-6" @click="submit()">Submit</button>
           <div class="des mt-7">Currently you are doing cross-chain</div>
           <div class="des">
             operations, and you need to complete the following operations:
@@ -79,13 +66,15 @@
       </div>
     </div>
     <!-- <button class="wallet">Connect Wallet</button> -->
+    <uComponents ref="ucom"></uComponents>
   </div>
 </template>
   
-  <script>
+<script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
-import { getMyCardList} from "@/api/home";
+import { getMyCardList } from "@/api/home";
+import { iris2Uptick } from "/src/keplr/uptick/wallet"
 import { getNftImg } from "/src/api/image";
 export default {
   name: "crossChain",
@@ -94,34 +83,36 @@ export default {
     return {
       userName: "",
       NftList: [
-       
+
       ],
-      crossName:'',
-      crossSrc:''
+      crossName: '',
+      crossSrc: '',
+      selectItem: {}
     };
   },
   filters: {},
   async mounted() {
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
-     this.getMyList();
+    this.getMyList();
   },
   methods: {
-     async  getMyList(){
-     let params = {
-        owner:this.$store.state.IrisAddress,
+    async getMyList() {
+      let params = {
+        owner: this.$store.state.IrisAddress,
         chainType: 'gon-irishub-1',
-     }
-     let listInfo = await getMyCardList(params);
+      }
+      let listInfo = await getMyCardList(params);
       let list = listInfo.data.list;
       this.NftList = this.NftList.concat(list);
-      this.crossSrc =  this.NftList[0].imgUrl
-       this.crossName = this.NftList[0].name
+      this.crossSrc = this.NftList[0].imgUrl
+      this.crossName = this.NftList[0].name
+      this.selectItem = this.NftList[0]
     },
     ChainChange(chainId) {
       console.log("ChainChange", chainId);
-     
-     
+
+
     },
     disconnect() {
       localStorage.clear();
@@ -129,19 +120,31 @@ export default {
       this.$store.commit("SET_UPTICK_DID", "");
       this.$router.push({ name: "Home" });
     },
-    submit() {
-      this.$router.push({ name: "withdrawConvert" });
+    async submit() {
+      console.log("item", this.selectItem);
+      try {
+        //执行跨链操作
+        let result = await iris2Uptick(this.selectItem.nftAddress, this.selectItem.nftId)
+        console.log(result)
+        this.$router.push({ name: "withdrawConvert" });
+
+      } catch (error) {
+        this.$toast("error", error.message)
+      }
+ 
+
     },
-    itemClick(item){
-      console.log("item",item);
+    itemClick(item) {
+      console.log("item", item);
       this.crossName = item.name
-      this.crossSrc= item.imgUrl
+      this.crossSrc = item.imgUrl
+      this.selectItem = item
     }
   },
 };
 </script>
   <!-- Add "scoped" attribute to limit CSS to this component only -->
-  <style lang='scss' scoped>
+<style lang='scss' scoped>
 .Title {
   font-family: "MuseoModerno-Regular";
   font-size: 50px;
@@ -151,6 +154,7 @@ export default {
   letter-spacing: 0px;
   color: #54df62;
 }
+
 .select {
   .filter {
     display: flex;
@@ -166,6 +170,7 @@ export default {
     letter-spacing: 0px;
     color: #ffffff;
   }
+
   .address {
     font-family: "AdobeHeitiStd-Regular";
     font-size: 15px;
@@ -174,6 +179,7 @@ export default {
     line-height: 20px;
     letter-spacing: 0px;
     color: #ffffff;
+
     .btn {
       width: 93px;
       height: 33px;
@@ -189,6 +195,7 @@ export default {
     }
   }
 }
+
 .Form {
   width: 100%;
   height: 75px;
@@ -206,13 +213,16 @@ export default {
     width: 80%;
     padding-left: 10%;
   }
+
   .transfer {
     width: 20%;
   }
 }
+
 .nftlist {
   width: 100%;
   margin-bottom: 135px;
+
   .left {
     width: 74%;
     height: 598px;
@@ -222,6 +232,7 @@ export default {
       &:hover {
         background: #1d0952;
       }
+
       .line {
         width: 100%;
         height: 1px;
@@ -234,6 +245,7 @@ export default {
         object-fit: cover;
         margin-top: 16px;
       }
+
       .Nftname {
         font-family: "MuseoModerno-Regular";
         font-size: 12px;
@@ -245,6 +257,7 @@ export default {
       }
     }
   }
+
   .right {
     width: 26%;
     height: 100px;
@@ -252,8 +265,10 @@ export default {
     background-color: #1a1a53;
     border-radius: 5px;
     border: solid 1px #611ecd;
+
     .contant {
       margin: 26px 29px 0 25px;
+
       .baseInfo {
         .ava {
           width: 61px;
@@ -261,6 +276,7 @@ export default {
           border-radius: 5px;
           object-fit: cover;
         }
+
         .nftname {
           font-family: "MuseoModerno-Regular";
           font-size: 12px;
@@ -271,15 +287,18 @@ export default {
           color: #ffffff;
         }
       }
+
       .upimg {
         width: 100%;
         display: flex;
         justify-content: center;
+
         .img {
           width: 16px;
           height: 14px;
         }
       }
+
       .submit {
         height: 41px;
         background-color: #54df62;
@@ -292,6 +311,7 @@ export default {
         letter-spacing: 0px;
         color: #4e1dc7;
       }
+
       .des {
         font-family: "MuseoModerno-Regular";
         font-size: 12px;
@@ -301,10 +321,12 @@ export default {
         letter-spacing: 0px;
         color: #ffffff;
       }
+
       .crossItem {
         height: 85px;
         background-color: #3d179f;
         border-radius: 5px;
+
         .From {
           font-family: "MuseoModerno-SemiBold";
           font-size: 17px;
@@ -314,10 +336,12 @@ export default {
           letter-spacing: 0px;
           color: #54df62;
         }
+
         .Iris {
           width: 35px;
           height: 35px;
         }
+
         .chainName {
           font-family: "MuseoModerno-SemiBold";
           font-size: 17px;
@@ -331,6 +355,7 @@ export default {
     }
   }
 }
+
 .wallet {
   margin-left: 34%;
   margin-top: 180px;
@@ -346,18 +371,22 @@ export default {
   letter-spacing: 0px;
   color: #54df62;
 }
+
 ::-webkit-scrollbar {
-  width: 4px; /* 设置滚动条宽度 */
+  width: 4px;
+  /* 设置滚动条宽度 */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #611ecd; /* 设置滚动条的颜色 */
-  border-radius: 2px; /* 设置滚动条的圆角 */
+  background-color: #611ecd;
+  /* 设置滚动条的颜色 */
+  border-radius: 2px;
+  /* 设置滚动条的圆角 */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #aaa; /* 设置滚动条的鼠标悬停颜色 */
-}
-</style>
+  background-color: #aaa;
+  /* 设置滚动条的鼠标悬停颜色 */
+}</style>
   
       
