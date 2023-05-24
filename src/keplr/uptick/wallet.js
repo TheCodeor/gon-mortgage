@@ -57,9 +57,14 @@ export async function convertCosmosNFT2ERC(typeUrl, classId, nftId, sender, rece
     // contractAddress: jspb.Message.getFieldWithDefault(msg, 5, ""),
     // tokenId: jspb.Message.getFieldWithDefault(msg, 6, "")
     let msg = {
-        typeUrl: typeUrl,
+        typeUrl: "/uptick.erc721.v1.MsgConvertNFT",
         value: [
-            classId, nftId, receiver, sender, contractAddress, tokenId]
+            classId,
+            nftId,
+            receiver,
+            sender,
+            contractAddress,
+            tokenId]
     }
     const result = await sendMsgsTx(account.bech32Address, [msg], 1000000, "0x1234");
     if (result.code == 0) {
@@ -86,10 +91,14 @@ export async function convertERC2CosmosNFT(typeUrl, classId, nftId, sender, rece
     // classId: jspb.Message.getFieldWithDefault(msg, 5, ""),
     // nftId: jspb.Message.getFieldWithDefault(msg, 6, "")
     let msg = {
-        typeUrl: typeUrl,
+        typeUrl: "/uptick.erc721.v1.MsgConvertERC721",
         value: [
             contractAddress,
-            tokenId, receiver, sender, classId, nftId]
+            tokenId,
+            receiver,
+            sender,
+            classId,
+            nftId]
     }
 
     const result = await sendMsgsTx(account.bech32Address, [msg], 1000000, "0x1234");
@@ -188,7 +197,7 @@ async function sendMsgsTx(address, msgs, amount, data, isIris = false) {
         )
 
     }
-debugger
+    debugger
     console.log("###xxl sendMsgsTx", [address, msgs, fee, data]);
     const result = await client.sendMsgsTx(address, msgs, fee, data);
     console.log("###xxl result", result);
@@ -224,7 +233,7 @@ export async function issueUptickDenomAndMint(
         value
     }
     msgs.push(msg);
-// debugger
+    // debugger
     for (var i = 0; i < amount; i++) {
 
         let nftID = getNftId();
@@ -261,35 +270,35 @@ export async function issueUptickDenomAndMint(
 
 export async function quiryUptickTx(tx) {
 
-	console.log("xxl ....");
-	try {
+    console.log("xxl ....");
+    try {
         const offlineSigner = await window.getOfflineSigner(chainId);
 
         let client = await StargateClient.connectWithSigner(
             uptickUrl,
             offlineSigner
         )
-		let result = await client.searchTx(tx);
-		console.log(result);
-		if (result.tx_result != null && result.tx_result.code == 0) {
-			return {
-				code: "0",
-				log: ""
-			}
-		} else if (result.tx_result != null && result.tx_result.code != 0) {
-			return {
-				code: "-1",
-				log: result.tx_result.log
-			}
-		} else {
-			return {
-				code: "-2",
-				log: "cannot get log"
-			}
-		}
-	} catch (e) {
-		return [-3, e.toString()];
-	}
+        let result = await client.searchTx(tx);
+        console.log(result);
+        if (result.tx_result != null && result.tx_result.code == 0) {
+            return {
+                code: "0",
+                log: ""
+            }
+        } else if (result.tx_result != null && result.tx_result.code != 0) {
+            return {
+                code: "-1",
+                log: result.tx_result.log
+            }
+        } else {
+            return {
+                code: "-2",
+                log: "cannot get log"
+            }
+        }
+    } catch (e) {
+        return [-3, e.toString()];
+    }
 
 }
 
