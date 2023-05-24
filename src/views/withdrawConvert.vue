@@ -20,20 +20,16 @@
     </div>
     <div class="nftlist d-flex flex-row mt-5">
       <div class="left">
-        <div
-          class="listItem d-flex flex-column"
-          v-for="(item, index) in NftList"
-          :key="index"
-        >
+        <div class="listItem d-flex flex-column" v-for="(item, index) in NftList" :key="index">
           <div class="d-flex flex-row align-center">
             <img class="img ml-5" :src="item.imgUrl" alt="" />
             <div class="Nftname ml-4">
-           {{item.name}}
+              {{ item.name }}
             </div>
-            <div class="withdraw" @click="withdrowButtonClick">
+            <div class="withdraw" @click="withdrowButtonClick(item)">
               <div>Withdraw to IRISnet</div>
             </div>
-            <div class="convert" @click="convertButtonClick">
+            <div class="convert" @click="convertButtonClick(item)">
               <div>Convert to Uptick-EVM</div>
             </div>
           </div>
@@ -43,13 +39,16 @@
       </div>
     </div>
     <!-- <button class="wallet">Connect Wallet</button> -->
+    <uComponents ref="ucom"></uComponents>
   </div>
 </template>
   
 <script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
-import { getMyCardList} from "@/api/home";
+import { getMyCardList } from "@/api/home";
+import { uptick2Iris, convertCosmosNFT2ERC } from "/src/keplr/uptick/wallet"
+
 export default {
   name: "crossChain",
   components: { Select },
@@ -57,12 +56,12 @@ export default {
     return {
       userName: "",
       NftList: [
-      
+
       ],
     };
   },
   filters: {},
-  created(){
+  created() {
     localStorage.setItem("selectChain", "Uptick-COSMOS");
   },
   async mounted() {
@@ -71,23 +70,41 @@ export default {
     this.getMyList();
   },
   methods: {
-     async getMyList(){
-     let params = {
-        owner:this.$store.state.UptickAddress,
+    async getMyList() {
+      let params = {
+        owner: this.$store.state.UptickAddress,
         chainType: 'origin_1170-1',
-     }
-     let listInfo = await getMyCardList(params);
+      }
+      let listInfo = await getMyCardList(params);
       let list = listInfo.data.list;
       this.NftList = this.NftList.concat(list);
-   
+
     },
-    withdrowButtonClick() {
+    async withdrowButtonClick(item) {
       console.log("withdraw");
+      console.log(item)
+      //跨回去iris
+      try {
+        let result = await uptick2Iris(item.nftAddress, item.nftId)
+        console.log(result)
+        this.$router.push({ name: "crossChain" });
+      } catch (error) {
+        this.$toast("error", error.message)
+      }
+
     },
-    convertButtonClick() {
+    async convertButtonClick(item) {
       console.log("convert");
-      // this.router.push({name:'redemption'})
-      // this.$router.push({ name: "pledge" });
+      console.log(item)
+
+      //跨回去iris
+      try {
+        let result = await convertCosmosNFT2ERC(item.nftAddress, item.nftId)
+        console.log(result)
+        this.$router.push({ name: "pledge" });
+      } catch (error) {
+        this.$toast("error", error.message)
+      }
     },
     disconnect() {
       localStorage.clear();

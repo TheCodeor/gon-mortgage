@@ -85,13 +85,13 @@ if (!window.getOfflineSigner || !window.keplr) {
            // If the user rejects it or the suggested chain information doesn't include the required fields, it will throw an error.
            // If the same chain id is already registered, it will resolve and not require the user interactions.
            await window.keplr.experimentalSuggestChain({
-            "chainId": "uptick_7000-1",
-            "chainName": "Uptick Testnet1",
-            "rpc": "http://52.74.190.214:8081/uptick",
-            "rest": "http://52.74.190.214:1317",
+            "chainId": "origin_1170-1",
+            "chainName": "Uptick Origin",
+            "rpc": "https://rpc.origin.uptick.network",
+            "rest": "https://rest.origin.uptick.network",
             "stakeCurrency": {
-              "coinDenom": "uptick",
-              "coinMinimalDenom": "auptick",
+              "coinDenom": "UOC",
+              "coinMinimalDenom": "auoc",
               "coinDecimals": 18,
               "coinGeckoId": "unknown"
             },
@@ -108,16 +108,16 @@ if (!window.getOfflineSigner || !window.keplr) {
             },
             "currencies": [
               {
-                "coinDenom": "UPTICK",
-                "coinMinimalDenom": "auptick",
+                "coinDenom": "UOC",
+                "coinMinimalDenom": "auoc",
                 "coinDecimals": 18,
                 "coinGeckoId": "unknown"
               }
             ],
             "feeCurrencies": [
               {
-                "coinDenom": "UPTICK",
-                "coinMinimalDenom": "auptick",
+                "coinDenom": "UOC",
+                "coinMinimalDenom": "auoc",
                 "coinDecimals": 18,
                 "coinGeckoId": "unknown",
                 "gasPriceStep": {
@@ -139,6 +139,8 @@ if (!window.getOfflineSigner || !window.keplr) {
  
    
            });
+
+
 
            // location.reload();
        } catch {
@@ -184,7 +186,7 @@ export const getkeplrUptickAddress = async () => {
 		// Modern dapp browsers
 		try {
 
-			const chainId = "uptick_7000-1";
+			const chainId = "origin_1170-1";
 			await window.keplr.enable(chainId);
 			web3 = await window.getOfflineSigner(chainId);
 
