@@ -14,21 +14,59 @@ export function setContractAddress(platformAddress) {
 }
 
 //根据质押周期获取费率
-export async function getRate() {
+export async function getRate(period) {
     try {
         let contract  = await connect(contractAddress,abi)
-        console.log('contract',contract);
+
         let gasSetting = await getGasPriceAndGasLimit();
-		console.log("gasSetting", gasSetting);
 		let result = await contract.getRate(
-            '604800'
+            period
         );
         let fee = parseInt(result._hex,16)/1000;
 
 		return fee;
     } catch (error) {
             console.log("error",error);
-    }
-       
+    }      
 }
+//质押NFT
+export async function mortgageNft(tokenAddress,tokenId,period) {
+        let contract  = await connect(contractAddress,abi)
+        let gasSetting = await getGasPriceAndGasLimit();
+		let result = await contract.Pledge(
+            tokenAddress,tokenId,period
+        );
+        return result  
+}
+// 赎回NFT
+export async function redeemNft(tokenAddress,tokenId,amount) {
+    let contract  = await connect(contractAddress,abi)
+    let gasSetting = await getGasPriceAndGasLimit();
+    let result = await contract.Redeem(
+        tokenAddress,tokenId,amount
+    );
+    return result  
+}
+
+//延期
+export async function Postpone(tokenAddress,tokenId) {
+    let contract  = await connect(contractAddress,abi)
+    let gasSetting = await getGasPriceAndGasLimit();
+    let result = await contract.Renewal(
+        tokenAddress,tokenId
+    );
+    return result  
+}
+//获取质押信息
+export async function getPledgeInfo(tokenAddress,tokenId) {
+    let contract  = await connect(contractAddress,abi)
+    let gasSetting = await getGasPriceAndGasLimit();
+    let result = await contract.getPledgeInfo(
+        tokenAddress,tokenId
+    );
+    return result  
+}
+
+
+
 
