@@ -28,7 +28,7 @@
             <div class="d-flex flex-row align-center">
               <div
                 class="d-flex flex-row align-center nfts"
-                :class="{ opacitys: item.status == '2' }"
+                :class="{ opacitys: item.status == '3' }"
               >
                 <img class="img ml-5" :src="item.imgUrl" alt="" />
                 <div class="Nftname ml-4">
@@ -38,18 +38,18 @@
               <div
                 class="Mortgage"
                 v-if="item.status == 0 || item.status == null"
-                :class="{ opacitys: item.status == '2' }"
+                :class="{ opacitys: item.status == '3' }"
               >
                 Not Mortgaged
               </div>
               <div
                 class="Mortgage"
-                v-else-if="item.status == '1'"
-                :class="{ opacitys: item.status == '2' }"
+                v-else-if="item.status == '1' || item.status == '2'"
+                :class="{ opacitys: item.status == '3' }"
               >
                 {{ item.price }} UPTICK
               </div>
-              <div class="time" :class="{ opacitys: item.status == '2' }">
+              <div class="time" :class="{ opacitys: item.status == '3' }">
                 {{ item.startTime }} ~ {{ item.endTime }} <br /><span
                   v-if="item.period"
                   >{{ item.period }} Days</span
@@ -58,21 +58,21 @@
               <button
                 class="btn"
                 v-if="item.status == null || item.status == 0"
-                :class="{ opacitys: item.status == '2' }"
+                :class="{ opacitys: item.status == '3' }"
                 @click="Mortgage(item)"
               >
                 Mortgage
               </button>
               <button
                 class="btn2"
-                v-else-if="item.status == '1'"
-                :class="{ opacitys: item.status == '2' }"
+                v-else-if="item.status == '1' ||item.status == '2' "
+                :class="{ opacitys: item.status == '3' }"
                 @click="Mortgage(item)"
               >
                 Redeem
               </button>
               <img
-                v-else-if="item.status == '2'"
+                v-else-if="item.status == '3'"
                 class="faild"
                 src="@/assets/confiscated.png"
                 alt=""
@@ -159,9 +159,10 @@
         </div>
       </div>
       <!-- 赎回操作 -->
-      <div class="redeem" v-else-if="status == 1">
+      <div class="redeem" v-else-if="status == 1 || status == 2">
         <div class="contant d-flex flex-column">
-          <div class="title">Redeem</div>
+          <div class="title" v-if="handType == 'redemption'">Redeem</div>
+           <div class="title" v-else>Postpone</div>
           <div class="baseInfo d-flex flex-row align-center">
             <img
               src="https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small"
@@ -202,7 +203,7 @@
                 </div>
               </div>
             </div>
-            <div class="help mt-4" @click="toPage">I want to postpone</div>
+            <div class="help mt-4" v-if="status == 1" @click="toPage">I want to postpone</div>
             <button class="submit mt-6" @click="redeemClick(selectItem)">
               Submit
             </button>
@@ -253,7 +254,7 @@
                   <div class="title-25 mt-4">{{ selectItem.total }} UPTICK</div>
                 </div>
               </div>
-              <button class="submit1 mt-6">Submit</button>
+              <button class="submit1 mt-6" @click="renewalClick(selectItem)">Submit</button>
             </div>
           </div>
         </div>
@@ -267,13 +268,14 @@
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
 import { getEvmAddress } from "../keplr/uptick/wallet";
-import { getMyCardList, pledgeNFT, ransomNFT } from "@/api/home";
+import { getMyCardList, pledgeNFT, ransomNFT,renewalNFT } from "@/api/home";
 import { addNetwork } from "../keplr/contract/handle/base";
 import {
   getRate,
   mortgageNft,
   redeemNft,
   getPledgeInfo,
+  postponeNft
 } from "../keplr/contract/handle/Pawnshop";
 import { getPrice } from "../keplr/contract/handle/Quotation";
 import { toShowValue, fromShowValue } from "../utils/helper";
@@ -300,6 +302,9 @@ export default {
     };
   },
   filters: {},
+   created() {
+    localStorage.setItem("selectChain", "Uptick-EVM");
+  },
   async mounted() {
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
@@ -414,23 +419,14 @@ export default {
 
     // 赎回
     async redeemClick(selectItem) {
-      console.log(
-        "redeemClick",
-        fromShowValue(selectItem.total.toString()),
-        selectItem.nftAddress,
-        selectItem.nftId
-      );
+    
       let result = await redeemNft(
         selectItem.nftAddress,
         selectItem.nftId,
         fromShowValue(selectItem.total.toString())
       );
-      console.log("result", result);
+     
       if (result.hash) {
-        //   nftAddress: string;
-        //   nftId: string;
-        //   owner: string;
-        //   hash: string;
         let params = {
           nftAddress: selectItem.nftAddress,
           nftId: selectItem.nftId,
@@ -446,11 +442,10 @@ export default {
         } else {
           this.$toast("error", "Ransom Error");
         }
-        console.log("ransom", ransom);
-      }
-
-      console.log("redeemClick", fromShowValue(selectItem.total.toString()));
+       
+      } 
     },
+    // 点击切换
     async Mortgage(item) {
       this.selectItem = item;
       let price = await getPrice(
@@ -462,16 +457,28 @@ export default {
       this.status = item.status;
       if (this.status == 1) {
         this.handType = "redemption";
-        let params = {
-          nftAddress: item.nftAddress,
-          nftId: item.nftId,
-        };
+       
         // 赎回获取Fee
-        let result = await getPledgeInfo(params);
+        let result = await getPledgeInfo(item.nftAddress,item.nftId);
         console.log("result ", result);
-      }
 
-      // 获取质押费率
+        // 获取质押费率
+      this.InterestFee = parseInt(result._rate._hex,16)/1000;
+      let price =parseInt(result._value._hex,16)
+       price = toShowValue(price.toString())
+       this.selectItem.price = price
+      console.log("InterestFee", this.InterestFee,price);
+      debugger
+      this.selectItem.fee = this.NumberMul(
+        Number(this.InterestFee),
+       price
+      );
+      // 获取总价
+      this.selectItem.total =
+        Number(this.selectItem.fee) + Number(price);
+      this.$forceUpdate();
+      }else{
+          // 获取质押费率
       this.InterestFee = await getRate(this.dayList[this.time_id].value);
       this.selectItem.fee = this.NumberMul(
         Number(this.InterestFee),
@@ -481,10 +488,48 @@ export default {
       this.selectItem.total =
         Number(this.selectItem.fee) + Number(this.selectItem.price);
       this.$forceUpdate();
+      }
+
+    
+    },
+    // 延期
+    async renewalClick(item){
+    
+     let result = await postponeNft(item.nftAddress,item.nftId)
+           console.log("result",result);
+        //            nftAddress: string;
+        //   nftId: string;
+        //   owner: string;
+        //  hash: string;
+        //  period: number;
+           if(result.hash){
+             let params ={
+               nftAddress:item.nftAddress,
+               nftId:item.nftId,
+               owner:getEvmAddress(this.$store.state.UptickAddress),
+               hash:result.hash
+             }
+           let renewal =  await renewalNFT(params)
+           console.log(renewal);
+            if (renewal.data.code == 0) {
+          this.$toast("success", "Renewal Success").then(() => {
+            this.NftList = [];
+            this.getMyList();
+          });
+        } else {
+          this.$toast("error", "Ransom Error");
+        }
+
+           }
     },
     toPage() {
       //  this.$router.push({name:"renewal"})
       this.handType = "renew";
+      setTimeout(()=>{
+          this.selectItem.fee = this.selectItem.fee *2
+          this.selectItem.total = Number(this.selectItem.fee) + Number(this.selectItem.price)
+          this.$forceUpdate()
+      },500)
     },
     showList() {
       this.isShow = !this.isShow;

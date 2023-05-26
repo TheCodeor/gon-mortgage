@@ -67,7 +67,11 @@ export function ransomNFT(params) {
    
     return service.post('/gonapi/nft/redeem',transObjToParamStr(params))
 }
-
+// 延期NFT 
+export function renewalNFT(params) {
+   
+    return service.post('/gonapi/nft/renewal',transObjToParamStr(params))
+}
 
 
 

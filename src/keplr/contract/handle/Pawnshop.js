@@ -63,16 +63,19 @@ export async function redeemNft(tokenAddress,tokenId,amount) {
 }
 
 //延期
-export async function Postpone(tokenAddress,tokenId) {
+export async function postponeNft(tokenAddress,tokenId) {
     let contract  = await connect(contractAddress,abi)
     let gasSetting = await getGasPriceAndGasLimit();
-    let result = await contract.Renewal(
+    let result = await contract.renewal(
         tokenAddress,tokenId
     );
     return result  
 }
 //获取质押信息
 export async function getPledgeInfo(tokenAddress,tokenId) {
+
+    console.log("getPledgeInfo",tokenAddress,tokenId);
+    debugger
 
     try {
         let contract  = await connect(contractAddress,abi)

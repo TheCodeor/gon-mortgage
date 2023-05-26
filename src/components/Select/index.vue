@@ -2,8 +2,8 @@
   <div class="Select">
     <button class="filter" @click="isShow">
       {{ selectChainName }}
-      <img class="icon" src="@/assets/icon_d.png" v-if="!isshow" alt="" />
-      <img class="icon" src="@/assets/icon_u.png" v-else alt="" />
+      <img class="icon" src="@/assets/icon_u.png" v-if="!isshow" alt="" />
+      <img class="icon" src="@/assets/icon_d.png" v-else alt="" />
     </button>
     <div class="list" v-if="isshow">
       <div class="listItem" v-for="(item, index) in list" :key="index">

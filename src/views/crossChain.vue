@@ -91,6 +91,9 @@ export default {
     };
   },
   filters: {},
+   created() {
+    localStorage.setItem("selectChain", "IRISnet");
+  },
   async mounted() {
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
