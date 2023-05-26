@@ -153,7 +153,7 @@
               </div>
             </div>
           </div>
-          <button class="submit mt-6" @click="mortgageClick(selectItem)">
+          <button class="submit mt-6" :class="{'sub-dis': isPay}" @click="mortgageClick(selectItem)">
             Submit
           </button>
         </div>
@@ -165,11 +165,11 @@
            <div class="title" v-else>Postpone</div>
           <div class="baseInfo d-flex flex-row align-center">
             <img
-              src="https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small"
+              :src="selectItem.imgUrl"
               class="ava"
               alt=""
             />
-            <div class="nftname ml-4">Wake up, Astro Boy!</div>
+            <div class="nftname ml-4">{{selectItem.name}}</div>
           </div>
           <div class="title-14 mt-5">Current Appraised Value :</div>
           <div class="price">{{ selectItem.price }} UPTICK</div>
@@ -204,7 +204,7 @@
               </div>
             </div>
             <div class="help mt-4" v-if="status == 1" @click="toPage">I want to postpone</div>
-            <button class="submit mt-6" @click="redeemClick(selectItem)">
+            <button class="submit mt-6"  :class="{'sub-dis': isPay}" @click="redeemClick(selectItem)">
               Submit
             </button>
           </div>
@@ -254,7 +254,7 @@
                   <div class="title-25 mt-4">{{ selectItem.total }} UPTICK</div>
                 </div>
               </div>
-              <button class="submit1 mt-6" @click="renewalClick(selectItem)">Submit</button>
+              <button class="submit1 mt-6" :class="{'sub-dis': isPay}" @click="renewalClick(selectItem)">Submit</button>
             </div>
           </div>
         </div>
@@ -286,6 +286,7 @@ export default {
   components: { Select },
   data() {
     return {
+      isPay:false,
       handType: "redemption",
       userName: "",
       status: "0",
@@ -314,8 +315,12 @@ export default {
     //  getRate();
   },
   methods: {
+    
     async mortgageClick(selectItem) {
-      let startTime = Date.parse(new Date()) / 1000;
+
+      try {
+        this.isPay =true
+         let startTime = Date.parse(new Date()) / 1000;
       console.log("sadwdew", selectItem);
 
       //质押NFT
@@ -340,11 +345,19 @@ export default {
             this.NftList = [];
             this.getMyList();
           });
-        } else {
+        } else{
           this.$toast("error", "Mortgage Error");
+          this.isPay =false
         }
       }
-      console.log(result);
+        
+      } catch (error) {
+        this.$toast("error", "Mortgage Error");
+         this.isPay =false
+      }
+      
+     
+
     },
     async getMyList() {
       let params = {
@@ -419,7 +432,9 @@ export default {
 
     // 赎回
     async redeemClick(selectItem) {
-    
+
+      try {
+        this.isPay = true
       let result = await redeemNft(
         selectItem.nftAddress,
         selectItem.nftId,
@@ -441,9 +456,16 @@ export default {
           });
         } else {
           this.$toast("error", "Ransom Error");
+           this.isPay = false
         }
        
       } 
+      } catch (error) {
+        this.$toast("error", "Ransom Error");
+        this.isPay = false
+      }
+    
+    
     },
     // 点击切换
     async Mortgage(item) {
@@ -494,8 +516,10 @@ export default {
     },
     // 延期
     async renewalClick(item){
-    
-     let result = await postponeNft(item.nftAddress,item.nftId)
+
+      try {
+        this.isPay = true
+         let result = await postponeNft(item.nftAddress,item.nftId)
            console.log("result",result);
         //            nftAddress: string;
         //   nftId: string;
@@ -518,9 +542,16 @@ export default {
           });
         } else {
           this.$toast("error", "Ransom Error");
+          this.isPay = false
         }
-
            }
+        
+      } catch (error) {
+        this.$toast("error", "Ransom Error");
+         this.isPay = false
+      }
+    
+    
     },
     toPage() {
       //  this.$router.push({name:"renewal"})
@@ -551,6 +582,31 @@ export default {
 </script>
   <!-- Add "scoped" attribute to limit CSS to this component only -->
   <style lang='scss' scoped>
+    .sub-dis {
+    position: relative;
+    pointer-events: none;
+    background-image: linear-gradient(
+      #766983, 
+      #766983), 
+     linear-gradient(
+      #270645, 
+      #270645) !important;
+     background-blend-mode: normal, 
+      normal;
+     border-radius: 25px;
+     opacity: 0.9;
+}
+.sub-dis::after {
+    content: "";
+    background-image: url(../assets/loading.gif);
+    background-size: 100%;
+    display: inline-block;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+   margin-left: 10px;
+   margin-top: 0px;
+}
 .Title {
   font-family: "MuseoModerno-Regular";
   font-size: 50px;

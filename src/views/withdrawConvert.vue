@@ -11,6 +11,8 @@
         </div>
       </div>
       <div class="filter">
+        <img src="@/assets/refresh.png" class="mr-2 mt-4" v-if="canClick" style="width: 30px; height: 30px;" alt="" @click="Reload" />
+         <div class="second mr-2 mt-4" v-if="!canClick">{{ second }}</div>
         <Select />
       </div>
     </div>
@@ -26,11 +28,11 @@
             <div class="Nftname ml-4">
               {{ item.name }}
             </div>
-            <div class="withdraw" @click="withdrowButtonClick(item)">
-              <div>Withdraw to IRISnet</div>
+            <div class="withdraw"  @click="withdrowButtonClick(item,index)">
+              <div  :class="index === selectItem ?'sub-dis' : ''">Withdraw to IRISnet</div>
             </div>
-            <div class="convert" @click="convertButtonClick(item)">
-              <div>Convert to Uptick-EVM</div>
+            <div class="convert"  @click="convertButtonClick(item,index)">
+              <div :class="index === convertItem ?'sub-dis' : ''">Convert to Uptick-EVM</div>
             </div>
           </div>
 
@@ -46,7 +48,7 @@
 <script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
-import { getMyCardList,conventNFT } from "@/api/home";
+import { getMyCardList,conventNFT,updateUser } from "@/api/home";
 import { uptick2Iris, convertCosmosNFT2ERC } from "/src/keplr/uptick/wallet"
 
 export default {
@@ -54,10 +56,16 @@ export default {
   components: { Select },
   data() {
     return {
+       isPay:false,
+       selectItem:'',
+       convertItem:'',
       userName: "",
       NftList: [
 
       ],
+          canClick: true,
+      second: 10,
+      timer: null,
     };
   },
   filters: {},
@@ -70,6 +78,30 @@ export default {
     this.getMyList();
   },
   methods: {
+     async Reload() {
+      if (!this.canClick) {
+        return;
+      }
+      this.canClick = false;
+      this.timer = setInterval(() => {
+        this.second--;
+        if (this.second === 0) {
+          clearInterval(this.timer);
+          this.canClick = true;
+          this.second = 10;
+        }
+      }, 1000);
+
+      let params = {
+        //this.$store.state.uptickAddress,this.$store.state.IrisAddress
+         owner: this.$store.state.UptickAddress,
+      };
+      let result = await updateUser(params)
+      console.log(result)
+       this.NftList =[]
+      await this.getMyList();
+
+    },
     async getMyList() {
       let params = {
         owner: this.$store.state.UptickAddress,
@@ -80,23 +112,29 @@ export default {
       this.NftList = this.NftList.concat(list);
 
     },
-    async withdrowButtonClick(item) {
+    async withdrowButtonClick(item,index) {
+      this.selectItem = index
       console.log("withdraw");
       console.log(item)
       //跨回去iris
       try {
+        this.isPay = true
         let result = await uptick2Iris(item.nftAddress, item.nftId)
         console.log(result)
         this.$router.push({ name: "crossChain" });
       } catch (error) {
         this.$toast("error", error.message)
+         this.isPay = false
+         this.selectItem = ''
       }
 
     },
-    async convertButtonClick(item) {
+    async convertButtonClick(item,index) {
+       this.convertItem = index
       console.log("convert");
       console.log(item)
       try {
+           this.isPay = true
         let result = await convertCosmosNFT2ERC(item.nftAddress, item.nftId)
         let evmAddress = result.evmAddress
          let uptickAddress = result.uptickAddress
@@ -117,8 +155,10 @@ export default {
         }
        let conventResult = await conventNFT(conventParms,bodyParams)
        console.log("conventResult",conventResult);
-        // this.$router.push({ name: "pledge" });
+        this.$router.push({ name: "pledge" });
       } catch (error) {
+           this.isPay = false
+           this.convertItem = ''
         this.$toast("error", error.message)
       }
     },
@@ -147,6 +187,18 @@ export default {
   .filter {
     display: flex;
     align-items: flex-end;
+       .second {
+  padding-top: 5px;
+  background-color: #611ecd;
+  color: #fb599b;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  text-align: center;
+  font-family: "AmpleSoft" !important;
+   font-size: 15px !important;
+
+}
   }
 
   .userName {
@@ -248,7 +300,8 @@ export default {
       }
 
       .withdraw {
-        width: 218px;
+        cursor: pointer;
+        width: 240px;
         height: 33px;
         background-color: #4e1dc7;
         border-radius: 16px;
@@ -262,9 +315,35 @@ export default {
         color: #54df62;
         margin-right: 20px;
       }
+      .sub-dis {
+    position: relative;
+    pointer-events: none;
+    background-image: linear-gradient(
+      #766983, 
+      #766983), 
+     linear-gradient(
+      #270645, 
+      #270645) !important;
+     background-blend-mode: normal, 
+      normal;
+     border-radius: 25px;
+     opacity: 0.9;
+}
+.sub-dis::after {
+    content: "";
+    background-image: url(../assets/loading.gif);
+    background-size: 100%;
+    display: inline-block;
+    position: absolute;
+    width: 15px;
+    height: 15px;
+   margin-left: 5px;
+   margin-top: 10px;
+}
 
       .convert {
-        width: 218px;
+         cursor: pointer;
+        width: 240px;
         height: 33px;
         background-color: #54df62;
         border-radius: 16px;

@@ -10,7 +10,9 @@
           <button class="btn ml-9" @click="disconnect">Disconnect</button>
         </div>
       </div>
-      <div class="filter">
+      <div class="filter ">
+         <img src="@/assets/refresh.png" class="mr-2 mt-4" v-if="canClick" style="width: 30px; height: 30px;" alt="" @click="Reload" />
+         <div class="second mr-2 mt-4" v-if="!canClick">{{ second }}</div>
         <Select @chainChange="ChainChange" />
       </div>
     </div>
@@ -50,7 +52,7 @@
             <img src="@/assets/icon_upticknetwork.png" class="Iris ml-9" alt="" />
             <div class="chainName ml-4">UptickEVM</div>
           </div>
-          <button class="submit mt-6" @click="submit()">Submit</button>
+          <button class="submit mt-6" :class="{'sub-dis': isPay}" @click="submit()">Submit</button>
           <div class="des mt-7">Currently you are doing cross-chain</div>
           <div class="des">
             operations, and you need to complete the following operations:
@@ -73,7 +75,7 @@
 <script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
-import { getMyCardList } from "@/api/home";
+import { getMyCardList,updateUser } from "@/api/home";
 import { iris2Uptick } from "/src/keplr/uptick/wallet"
 import { getNftImg } from "/src/api/image";
 export default {
@@ -81,13 +83,17 @@ export default {
   components: { Select },
   data() {
     return {
+      isPay:false,
       userName: "",
       NftList: [
 
       ],
       crossName: '',
       crossSrc: '',
-      selectItem: {}
+      selectItem: {},
+      canClick: true,
+      second: 10,
+      timer: null,
     };
   },
   filters: {},
@@ -115,6 +121,30 @@ export default {
       }
      
     },
+    async Reload() {
+      if (!this.canClick) {
+        return;
+      }
+      this.canClick = false;
+      this.timer = setInterval(() => {
+        this.second--;
+        if (this.second === 0) {
+          clearInterval(this.timer);
+          this.canClick = true;
+          this.second = 10;
+        }
+      }, 1000);
+
+      let params = {
+        //this.$store.state.uptickAddress,this.$store.state.IrisAddress
+         owner: this.$store.state.IrisAddress,
+      };
+      let result = await updateUser(params)
+      console.log(result)
+       this.NftList =[]
+      await this.getMyList();
+
+    },
     ChainChange(chainId) {
       console.log("ChainChange", chainId);
 
@@ -127,8 +157,10 @@ export default {
       this.$router.push({ name: "Home" });
     },
     async submit() {
+
       console.log("item", this.selectItem);
       try {
+        this.isPay = true
         //执行跨链操作
         let result = await iris2Uptick(this.selectItem.nftAddress, this.selectItem.nftId)
         console.log(result)
@@ -136,6 +168,7 @@ export default {
 
       } catch (error) {
         this.$toast("error", error.message)
+         this.isPay = false
       }
  
 
@@ -165,6 +198,18 @@ export default {
   .filter {
     display: flex;
     align-items: flex-end;
+    .second {
+  padding-top: 5px;
+  background-color: #611ecd;
+  color: #fb599b;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  text-align: center;
+  font-family: "AmpleSoft" !important;
+   font-size: 15px !important;
+
+}
   }
 
   .userName {
@@ -317,6 +362,31 @@ export default {
         letter-spacing: 0px;
         color: #4e1dc7;
       }
+      .sub-dis {
+    position: relative;
+    pointer-events: none;
+    background-image: linear-gradient(
+      #766983, 
+      #766983), 
+     linear-gradient(
+      #270645, 
+      #270645) !important;
+     background-blend-mode: normal, 
+      normal;
+     border-radius: 25px;
+     opacity: 0.9;
+}
+.sub-dis::after {
+    content: "";
+    background-image: url(../assets/loading.gif);
+    background-size: 100%;
+    display: inline-block;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+   margin-left: 10px;
+   margin-top: 0px;
+}
 
       .des {
         font-family: "MuseoModerno-Regular";

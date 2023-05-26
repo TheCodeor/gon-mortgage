@@ -72,6 +72,9 @@ export function renewalNFT(params) {
    
     return service.post('/gonapi/nft/renewal',transObjToParamStr(params))
 }
+export function updateUser(params) {
+    return service.get('/gonapi/nft/updateUser?'+transObjToParamStr(params))
+}
 
 
 
