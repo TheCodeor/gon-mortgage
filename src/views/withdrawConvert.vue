@@ -46,7 +46,7 @@
 <script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
-import { getMyCardList } from "@/api/home";
+import { getMyCardList,conventNFT } from "@/api/home";
 import { uptick2Iris, convertCosmosNFT2ERC } from "/src/keplr/uptick/wallet"
 
 export default {
@@ -96,12 +96,28 @@ export default {
     async convertButtonClick(item) {
       console.log("convert");
       console.log(item)
-
-      //跨回去iris
       try {
         let result = await convertCosmosNFT2ERC(item.nftAddress, item.nftId)
-        console.log(result)
-        this.$router.push({ name: "pledge" });
+        let evmAddress = result.evmAddress
+         let uptickAddress = result.uptickAddress
+         const logInfo = JSON.parse(result.rawLog)
+         let nftAddress = logInfo[0].events[0].attributes[4].value
+         let nftId = logInfo[0].events[0].attributes[5].value
+        console.log("result",evmAddress,uptickAddress,nftAddress,nftId)
+        let conventParms = {
+          evmOwner:result.evmAddress,
+          evmNftAddress:nftAddress,
+          evmNftId:nftId,
+        }
+        let bodyParams = {
+          nftAddress:item.nftAddress,
+          nftId:item.nftId,
+          owner:result.uptickAddress,
+          chainType:'1170'
+        }
+       let conventResult = await conventNFT(conventParms,bodyParams)
+       console.log("conventResult",conventResult);
+        // this.$router.push({ name: "pledge" });
       } catch (error) {
         this.$toast("error", error.message)
       }

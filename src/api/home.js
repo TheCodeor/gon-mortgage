@@ -50,6 +50,26 @@ export function cardDetail(params) {
    
     return service.post('/gonapi/nft/nftInfo',transObjToParamStr(params))
 }
+// 转化NFT cosmos -> evm 
+export function conventNFT(params,bodyParams) {
+    return service.post('/gonapi/nft/cosmosConvertEVM?evmOwner='+params.evmOwner + '&evmNftAddress=' +params.evmNftAddress+ '&evmNftId=' +params.evmNftId, 
+        transObjToParamStr(bodyParams)
+    )
+}
+
+// 质押Nft
+export function pledgeNFT(params) {
+   
+    return service.post('/gonapi/nft/pledge',transObjToParamStr(params))
+}
+// 赎回NFT
+export function ransomNFT(params) {
+   
+    return service.post('/gonapi/nft/redeem',transObjToParamStr(params))
+}
+
+
+
 
 
 function transObjToParamStr(object) {

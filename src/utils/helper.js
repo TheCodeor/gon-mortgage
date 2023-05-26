@@ -1,3 +1,5 @@
+var Web3 = require('web3');
+const web3Obj = new Web3();
 const arr = [
 	{
 		symbol: "11",
@@ -28,8 +30,8 @@ export const getRanHex = size => {
 
 export const timestampToDate = (time) => {
 	let date = new Date(time);
-	let Y = date.getFullYear() + "-";
-	let M = (date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1) + "-";
+	let Y = date.getFullYear() + ".";
+	let M = (date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1) + ".";
 	let D = (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
 	// let h = (date.getHours() < 10 ? '0'+date.getHours() : date.getHours()) + ':';
 	// let m = (date.getMinutes() < 10 ? '0'+date.getMinutes() : date.getMinutes()) + ':';
@@ -40,8 +42,8 @@ export const timestampToDate = (time) => {
 
 export const timestampToDateTime = (time) => {
 	let date = new Date(time)
-	let Y = date.getFullYear() + '-';
-	let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+	let Y = date.getFullYear() + '.';
+	let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '.';
 	let D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ';
 	let h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
 	let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
@@ -109,24 +111,17 @@ export const fromSymbolToUnit = (symbol) => {
 	}
 
 }
-export const getSettingArr = ()=>{
-	const json = localStorage.getItem("key_user");
-    let address = JSON.parse(json);
-	let StorageListObj = JSON.parse(localStorage.getItem("IRIS_SettingSelectList_"+address.did)) 
-	let pushTypes =[]
-	if(StorageListObj){
-		if(StorageListObj.length >0){
-			for (let i = 0; i < StorageListObj.length; i++) {
-				pushTypes.push(StorageListObj[i].key)					
-			}
-			return pushTypes.join(',')
-		}else{
-			return "-1"
-		}
-	
-}else{
-	return ''
-}	
-	
 
+export const toShowValue = (OrgValue)=>{	
+	
+	let retValue = web3Obj.utils.fromWei(OrgValue);
+	
+	return retValue.toString();
+}
+
+export const fromShowValue = (OrgValue)=>{	
+	
+	let retValue = web3Obj.utils.toWei(OrgValue);
+	
+	return retValue.toString();
 }

@@ -27,6 +27,13 @@ export async function addNetwork() {
         console.error(error);
     }
 }
+export async function getAccounts(){
+     
+ let web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+    await web3Provider.send('eth_requestAccounts', []);
+    let signer = await web3Provider.getSigner();
+   return signer;
+}
 export async function connect(address, abi) {
     let web3Provider = new ethers.providers.Web3Provider(window.ethereum);
     await web3Provider.send('eth_requestAccounts', []);

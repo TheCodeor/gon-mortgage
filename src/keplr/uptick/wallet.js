@@ -50,13 +50,14 @@ export async function convertCosmosNFT2ERC(denomId, nftId) {
                 ""]
         }
         const result = await sendMsgsTx(uptickAddress, [msg], 1000000, "0x1234");
+        result.evmAddress = evmAddress
+        result.uptickAddress = uptickAddress
         console.log(result)
         console.log(JSON.parse(result.rawLog))
         debugger
         if (result.code == 0) {
-            const logInfo = JSON.parse(result.rawLog)
-
-            return logInfo;
+            // const logInfo = JSON.parse(result.rawLog)
+            return result;
         } else {
             throw new Error(result.rawLog)
         }
@@ -387,6 +388,7 @@ function getNftId() {
 
 
 export function getEvmAddress(uptickAddress) {
+    console.log("uptickAddress",uptickAddress);
     let decode = bech32.decode(uptickAddress);
     let array = bech32.fromWords(decode.words);
     let address = toHexString(array);

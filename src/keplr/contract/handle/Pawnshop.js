@@ -2,6 +2,7 @@ import { connect,getGasPriceAndGasLimit } from "./base";
 import {
     abi
 } from "../artifact/Pawnshop.json";
+import { isApprovedForAll,setApprovalForAll } from "./uptick721";
 
 let contractAddress = '0x43be1f90567a0c55560a40912926b32050b490e4'
 
@@ -22,6 +23,7 @@ export async function getRate(period) {
 		let result = await contract.getRate(
             period
         );
+        
         let fee = parseInt(result._hex,16)/1000;
 
 		return fee;
@@ -31,19 +33,31 @@ export async function getRate(period) {
 }
 //质押NFT
 export async function mortgageNft(tokenAddress,tokenId,period) {
+    debugger
+
+    // 判断是否授权
+    let isApproved = await isApprovedForAll(tokenAddress);
+    if (!isApproved){
+        let setApproval= await setApprovalForAll(tokenAddress);
+        console.log('setApproval',setApproval);
+    }
         let contract  = await connect(contractAddress,abi)
         let gasSetting = await getGasPriceAndGasLimit();
-		let result = await contract.Pledge(
+		let result = await contract.pledge(
             tokenAddress,tokenId,period
         );
         return result  
 }
 // 赎回NFT
 export async function redeemNft(tokenAddress,tokenId,amount) {
+
+    console.log('redeemNft',tokenAddress,tokenId,amount,contractAddress);
+    debugger
     let contract  = await connect(contractAddress,abi)
     let gasSetting = await getGasPriceAndGasLimit();
-    let result = await contract.Redeem(
-        tokenAddress,tokenId,amount
+    let result = await contract.redeem(
+        tokenAddress,tokenId,
+        { value:amount,gasPrice: gasSetting.gasPrice, gasLimit: gasSetting.gasLimit }
     );
     return result  
 }
@@ -59,12 +73,20 @@ export async function Postpone(tokenAddress,tokenId) {
 }
 //获取质押信息
 export async function getPledgeInfo(tokenAddress,tokenId) {
-    let contract  = await connect(contractAddress,abi)
-    let gasSetting = await getGasPriceAndGasLimit();
-    let result = await contract.getPledgeInfo(
-        tokenAddress,tokenId
-    );
-    return result  
+
+    try {
+        let contract  = await connect(contractAddress,abi)
+        let gasSetting = await getGasPriceAndGasLimit();
+        let result = await contract.getPledgeInfo(
+            tokenAddress,tokenId
+        );
+       
+        return result    
+    } catch (error) {
+            console.log(error);
+    }
+
+
 }
 
 

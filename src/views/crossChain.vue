@@ -18,7 +18,7 @@
       <div class="name">NFTs</div>
       <div class="transfer">Cross-chain Transfer</div>
     </div>
-    <div class="nftlist d-flex flex-row mt-5">
+    <div class="nftlist d-flex flex-row mt-5" v-if="NftList.length > 0">
       <div class="left">
         <div class="listItem d-flex flex-column" v-for="(item, index) in NftList" :key="index" @click="itemClick(item)">
           <div class="d-flex flex-row align-center">
@@ -66,7 +66,7 @@
       </div>
     </div>
     <!-- <button class="wallet">Connect Wallet</button> -->
-    <uComponents ref="ucom"></uComponents>
+   <uComponents ref="ucom"></uComponents>
   </div>
 </template>
   
@@ -105,9 +105,12 @@ export default {
       let listInfo = await getMyCardList(params);
       let list = listInfo.data.list;
       this.NftList = this.NftList.concat(list);
-      this.crossSrc = this.NftList[0].imgUrl
+      if(this.NftList.length > 0){
+         this.crossSrc = this.NftList[0].imgUrl
       this.crossName = this.NftList[0].name
       this.selectItem = this.NftList[0]
+      }
+     
     },
     ChainChange(chainId) {
       console.log("ChainChange", chainId);

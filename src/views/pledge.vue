@@ -28,37 +28,51 @@
             <div class="d-flex flex-row align-center">
               <div
                 class="d-flex flex-row align-center nfts"
-                :class="{ opacitys: item.state == '3' }"
+                :class="{ opacitys: item.status == '2' }"
               >
-                <img class="img ml-5" :src="item.src" alt="" />
+                <img class="img ml-5" :src="item.imgUrl" alt="" />
                 <div class="Nftname ml-4">
-                  Wake up, Astro Boy!Wake up, Astro Boy!
+                  {{ item.name }}
                 </div>
               </div>
-              <div class="Mortgage" :class="{ opacitys: item.state == '3' }">
+              <div
+                class="Mortgage"
+                v-if="item.status == 0 || item.status == null"
+                :class="{ opacitys: item.status == '2' }"
+              >
                 Not Mortgaged
               </div>
-              <div class="time" :class="{ opacitys: item.state == '3' }">
-                2023.5.15 ~ 2023.6.14 18:00:00 <br /><span>30 Days</span>
+              <div
+                class="Mortgage"
+                v-else-if="item.status == '1'"
+                :class="{ opacitys: item.status == '2' }"
+              >
+                {{ item.price }} UPTICK
+              </div>
+              <div class="time" :class="{ opacitys: item.status == '2' }">
+                {{ item.startTime }} ~ {{ item.endTime }} <br /><span
+                  v-if="item.period"
+                  >{{ item.period }} Days</span
+                >
               </div>
               <button
                 class="btn"
-                v-if="item.state == '1'"
-                :class="{ opacitys: item.state == '3' }"
+                v-if="item.status == null || item.status == 0"
+                :class="{ opacitys: item.status == '2' }"
                 @click="Mortgage(item)"
               >
                 Mortgage
               </button>
               <button
                 class="btn2"
-                v-else-if="item.state == '2'"
-                :class="{ opacitys: item.state == '3' }"
+                v-else-if="item.status == '1'"
+                :class="{ opacitys: item.status == '2' }"
                 @click="Mortgage(item)"
               >
                 Redeem
               </button>
               <img
-                v-else-if="item.state == '3'"
+                v-else-if="item.status == '2'"
                 class="faild"
                 src="@/assets/confiscated.png"
                 alt=""
@@ -70,32 +84,28 @@
         </div>
       </div>
       <!-- 质押操作 -->
-      <div class="right" v-if="status == 1">
+      <div class="right" v-if="status == 0 || status == null">
         <div class="contant d-flex flex-column">
           <div class="title">Mortgage</div>
           <div class="baseInfo d-flex flex-row align-center">
-            <img
-              src="https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small"
-              class="ava"
-              alt=""
-            />
-            <div class="nftname ml-4">Wake up, Astro Boy!</div>
+            <img :src="selectItem.imgUrl" class="ava" alt="" />
+            <div class="nftname ml-4">{{ selectItem.name }}</div>
           </div>
           <div class="title-14 mt-5">Current Appraised Value :</div>
-          <div class="price mt-2">100 UPTICK</div>
+          <div class="price mt-2">{{ selectItem.price }} UPTICK</div>
           <div class="title-14 mt-5">Mortgage Period :</div>
           <div class="selectList mt-2" @click="showList">
-            <div class="date">7 Days</div>
+            <div class="date">{{ dayList[time_id].text }}</div>
             <img src="@/assets/icon_u.png" class="icon" alt="" />
-            <div  v-for="(item,index) in dayList" :key="index">
-               <div class="list" v-if="isShow">
-                 <div v-for="(item,index) in dayList" :key="index">
-                       <div class="dayName" @click="clickItem(index)">{{item.text}}</div>     
-                 </div>
-          
+            <div v-for="(item, index) in dayList" :key="index">
+              <div class="list" v-if="isShow">
+                <div v-for="(item, index) in dayList" :key="index">
+                  <div class="dayName" @click="clickItem(index)">
+                    {{ item.text }}
+                  </div>
+                </div>
+              </div>
             </div>
-            </div>
-           
           </div>
 
           <div class="Ransom mt-5">
@@ -121,33 +131,35 @@
               </div>
             </div>
             <div class="title mt-4">Mortgage Period</div>
-            <div class="title-25 mt-2">70 UPTICK</div>
+            <div class="title-25 mt-2">{{ selectItem.price }} UPTICK</div>
             <div class="content">
               <div class="details">
                 <div class="title">Ransom</div>
                 <div class="Info d-flex flex-row align-center">
                   <div class="leftItem mt-2">
                     <div class="Principal">Principal</div>
-                    <div class="prices">70 UPTICK</div>
+                    <div class="prices">{{ selectItem.price }} UPTICK</div>
                   </div>
 
                   <div class="mt-2 ml-7 mr-7" style="color: #ffffff">+</div>
                   <div class="leftItem mt-2">
                     <div class="Principal">Interest</div>
-                    <div class="prices">0.7 UPTICK</div>
+                    <div class="prices">{{ selectItem.fee }} UPTICK</div>
                   </div>
 
                   <!-- <div class="Interest">Interest</div> -->
                 </div>
-                <div class="title-25 mt-4">70.7 UPTICK</div>
+                <div class="title-25 mt-4">{{ selectItem.total }} UPTICK</div>
               </div>
             </div>
           </div>
-          <button class="submit mt-6">Submit</button>
+          <button class="submit mt-6" @click="mortgageClick(selectItem)">
+            Submit
+          </button>
         </div>
       </div>
       <!-- 赎回操作 -->
-      <div class="redeem" v-else>
+      <div class="redeem" v-else-if="status == 1">
         <div class="contant d-flex flex-column">
           <div class="title">Redeem</div>
           <div class="baseInfo d-flex flex-row align-center">
@@ -159,12 +171,13 @@
             <div class="nftname ml-4">Wake up, Astro Boy!</div>
           </div>
           <div class="title-14 mt-5">Current Appraised Value :</div>
-          <div class="price">100 UPTICK</div>
+          <div class="price">{{ selectItem.price }} UPTICK</div>
           <div class="title-14 mt-5">Mortgage amount :</div>
-          <div class="price">100 UPTICK</div>
+          <div class="price">{{ selectItem.price }}UPTICK</div>
           <div class="title-14 mt-5">Mortgage Period :</div>
           <div class="title-13 mt-3">
-            2023.5.15 ~ 2023.6.14 18:00:00 30 Days
+            {{ selectItem.startTime }} ~ {{ selectItem.endTime }}
+            {{ selectItem.period }} Days
           </div>
           <!-- 正常赎回 -->
           <div v-if="handType == 'redemption'">
@@ -175,22 +188,24 @@
                   <div class="Info d-flex flex-row align-center">
                     <div class="leftItem mt-4">
                       <div class="Principal">Principal</div>
-                      <div class="prices">70 UPTICK</div>
+                      <div class="prices">{{ selectItem.price }} UPTICK</div>
                     </div>
 
                     <div class="mt-4 ml-7 mr-7" style="color: #ffffff">+</div>
                     <div class="leftItem mt-4">
                       <div class="Principal">Interest</div>
-                      <div class="prices">0.7 UPTICK</div>
+                      <div class="prices">{{ selectItem.fee }} UPTICK</div>
                     </div>
                     <!-- <div class="Interest">Interest</div> -->
                   </div>
-                  <div class="title-25 mt-4">70.7 UPTICK</div>
+                  <div class="title-25 mt-4">{{ selectItem.total }} UPTICK</div>
                 </div>
               </div>
             </div>
             <div class="help mt-4" @click="toPage">I want to postpone</div>
-            <button class="submit mt-6">Submit</button>
+            <button class="submit mt-6" @click="redeemClick(selectItem)">
+              Submit
+            </button>
           </div>
           <!-- 续费操作 -->
           <div v-else>
@@ -217,25 +232,25 @@
                 </div>
               </div>
               <div class="title1 pt-4">Mortgage Period</div>
-              <div class="title-25 mt-2">70 UPTICK</div>
+              <div class="title-25 mt-2">{{selectItem.price}}UPTICK</div>
               <div class="content">
                 <div class="details">
                   <div class="title1">Ransom</div>
                   <div class="Info d-flex flex-row align-center">
                     <div class="leftItem mt-2">
                       <div class="Principal">Principal</div>
-                      <div class="prices">70 UPTICK</div>
+                      <div class="prices">{{ selectItem.price }} UPTICK</div>
                     </div>
 
                     <div class="mt-2 ml-7 mr-7" style="color: #ffffff">+</div>
                     <div class="leftItem mt-2">
                       <div class="Principal">Interest</div>
-                      <div class="prices">0.7 UPTICK</div>
+                      <div class="prices">{{ selectItem.fee }} UPTICK</div>
                     </div>
 
                     <!-- <div class="Interest">Interest</div> -->
                   </div>
-                  <div class="title-25 mt-4">70.7 UPTICK</div>
+                  <div class="title-25 mt-4">{{ selectItem.total }} UPTICK</div>
                 </div>
               </div>
               <button class="submit1 mt-6">Submit</button>
@@ -244,14 +259,25 @@
         </div>
       </div>
     </div>
+    <uComponents ref="ucom"></uComponents>
   </div>
 </template>
   
   <script>
 import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
+import { getEvmAddress } from "../keplr/uptick/wallet";
+import { getMyCardList, pledgeNFT, ransomNFT } from "@/api/home";
 import { addNetwork } from "../keplr/contract/handle/base";
-import {getRate  } from "../keplr/contract/handle/Pawnshop";
+import {
+  getRate,
+  mortgageNft,
+  redeemNft,
+  getPledgeInfo,
+} from "../keplr/contract/handle/Pawnshop";
+import { getPrice } from "../keplr/contract/handle/Quotation";
+import { toShowValue, fromShowValue } from "../utils/helper";
+import { timestampToDate, timestampToDateTime } from "../utils/helper";
 
 export default {
   name: "pledge",
@@ -260,82 +286,201 @@ export default {
     return {
       handType: "redemption",
       userName: "",
-      status: "1",
+      status: "0",
+      time_id: 0,
       isShow: false,
       isShowExplain: false,
-      dayList:[
-        {text:"7 Days"},
-        {text:"30 Days"}
+      dayList: [
+        { text: "7 Days", value: "604800" },
+        { text: "30 Days", value: "2592000" },
       ],
-      NftList: [
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-          state: 1,
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-          state: 2,
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-          state: 3,
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-          state: 1,
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-          state: 1,
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-          state: 1,
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-          state: 2,
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-        },
-        {
-          src:
-            "https://d3i65oqeoaoxhj.cloudfront.net/QmTpb65U1hw46ieCwVq1MquCrwYDpwsPZdwwpo9jB8TAK2/small",
-          state: 3,
-        },
-      ],
+      NftList: [],
+      selectItem: {},
+      InterestFee: "",
     };
   },
   filters: {},
   async mounted() {
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
-   await addNetwork();
-   getRate();
- 
-   
+    await addNetwork();
+    await this.getMyList();
+
+    //  getRate();
   },
   methods: {
+    async mortgageClick(selectItem) {
+      let startTime = Date.parse(new Date()) / 1000;
+      console.log("sadwdew", selectItem);
 
-  
-    clickItem(index){
-   
-    },
-    Mortgage(item) {
-      console.log(item);
-      this.status = item.state;
-      if (this.status == 2) {
-        this.handType = "redemption";
+      //质押NFT
+      let result = await mortgageNft(
+        selectItem.nftAddress,
+        selectItem.nftId,
+        this.dayList[this.time_id].value
+      );
+      if (result.hash) {
+        let params = {
+          nftAddress: selectItem.nftAddress,
+          nftId: selectItem.nftId,
+          status: 1,
+          hash: result.hash,
+          price: selectItem.price,
+          startTime: startTime,
+          period: this.dayList[this.time_id].value,
+        };
+        let infoResult = await pledgeNFT(params);
+        if (infoResult.data.code == 0) {
+          this.$toast("success", "Mortgage Success").then(() => {
+            this.NftList = [];
+            this.getMyList();
+          });
+        } else {
+          this.$toast("error", "Mortgage Error");
+        }
       }
+      console.log(result);
+    },
+    async getMyList() {
+      let params = {
+        owner: getEvmAddress(this.$store.state.UptickAddress),
+        chainType: "1170",
+      };
+      let listInfo = await getMyCardList(params);
+      let list = listInfo.data.list;
+      this.NftList = this.NftList.concat(list);
+      this.NftList.forEach((e) => {
+        if (e.startTime) e.startTime = timestampToDate(e.startTime * 1000);
+        if (e.endTime) e.endTime = timestampToDateTime(e.endTime * 1000);
+        if (e.period) e.period = e.period / 86400;
+      });
+      if (this.NftList.length > 0) {
+        this.selectItem = this.NftList[0];
+        let price = await getPrice(
+          this.selectItem.nftAddress,
+          this.selectItem.nftId
+        );
+        this.selectItem.price = toShowValue(price.toString());
+        // 获取质押费率
+        this.InterestFee = await getRate(this.dayList[this.time_id].value);
+        this.selectItem.fee = this.NumberMul(
+          Number(this.InterestFee),
+          Number(this.selectItem.price)
+        );
+        //获取总价
+        this.selectItem.total =
+          Number(this.selectItem.fee) + Number(this.selectItem.price);
+        this.$forceUpdate();
+      }
+    },
+    NumberMul(arg1, arg2) {
+      var m = 0;
+      var s1 = arg1.toString();
+      var s2 = arg2.toString();
+      try {
+        if (s1.indexOf(".") != -1) {
+          m += s1.split(".")[1].length;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+      try {
+        if (s2.indexOf(".") != -1) {
+          m += s2.split(".")[1].length;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+
+      return (
+        (Number(s1.replace(".", "")) * Number(s2.replace(".", ""))) /
+        Math.pow(10, m)
+      );
+    },
+
+    async clickItem(index) {
+      this.time_id = index;
+      // 获取质押费率
+      this.InterestFee = await getRate(this.dayList[this.time_id].value);
+      this.selectItem.fee = this.NumberMul(
+        Number(this.InterestFee),
+        Number(this.selectItem.price)
+      );
+      //获取总价
+      this.selectItem.total =
+        Number(this.selectItem.fee) + Number(this.selectItem.price);
+      this.$forceUpdate();
+    },
+
+    // 赎回
+    async redeemClick(selectItem) {
+      console.log(
+        "redeemClick",
+        fromShowValue(selectItem.total.toString()),
+        selectItem.nftAddress,
+        selectItem.nftId
+      );
+      let result = await redeemNft(
+        selectItem.nftAddress,
+        selectItem.nftId,
+        fromShowValue(selectItem.total.toString())
+      );
+      console.log("result", result);
+      if (result.hash) {
+        //   nftAddress: string;
+        //   nftId: string;
+        //   owner: string;
+        //   hash: string;
+        let params = {
+          nftAddress: selectItem.nftAddress,
+          nftId: selectItem.nftId,
+          owner: getEvmAddress(this.$store.state.UptickAddress),
+          hash: result.hash,
+        };
+        let ransom = await ransomNFT(params);
+        if (ransom.data.code == 0) {
+          this.$toast("success", "Redeem Success").then(() => {
+            this.NftList = [];
+            this.getMyList();
+          });
+        } else {
+          this.$toast("error", "Ransom Error");
+        }
+        console.log("ransom", ransom);
+      }
+
+      console.log("redeemClick", fromShowValue(selectItem.total.toString()));
+    },
+    async Mortgage(item) {
+      this.selectItem = item;
+      let price = await getPrice(
+        this.selectItem.nftAddress,
+        this.selectItem.nftId
+      );
+      this.selectItem.price = toShowValue(price.toString());
+      console.log(item);
+      this.status = item.status;
+      if (this.status == 1) {
+        this.handType = "redemption";
+        let params = {
+          nftAddress: item.nftAddress,
+          nftId: item.nftId,
+        };
+        // 赎回获取Fee
+        let result = await getPledgeInfo(params);
+        console.log("result ", result);
+      }
+
+      // 获取质押费率
+      this.InterestFee = await getRate(this.dayList[this.time_id].value);
+      this.selectItem.fee = this.NumberMul(
+        Number(this.InterestFee),
+        Number(this.selectItem.price)
+      );
+      // 获取总价
+      this.selectItem.total =
+        Number(this.selectItem.fee) + Number(this.selectItem.price);
+      this.$forceUpdate();
     },
     toPage() {
       //  this.$router.push({name:"renewal"})

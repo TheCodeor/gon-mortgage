@@ -11,16 +11,6 @@ export function setContractAddress(platformAddress) {
         contractAddress = platformAddress;
     }
 }
-
-//报价NFT
-export async function quotedPrice(tokenAddress,tokenId,price) {
-    let contract  = await connect(contractAddress,abi)
-    let gasSetting = await getGasPriceAndGasLimit();
-    let result = await contract.QuotedPrice(
-        tokenAddress,tokenId,price
-    );
-    return result  
-}
 //获取价格
 export async function getPrice(tokenAddress,tokenId) {
     let contract  = await connect(contractAddress,abi)
@@ -28,7 +18,8 @@ export async function getPrice(tokenAddress,tokenId) {
     let result = await contract.getPrice(
         tokenAddress,tokenId
     );
-    return result  
+    let price = parseInt(result._hex,16);
+    return price  
 }
 
 
