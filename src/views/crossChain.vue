@@ -1,7 +1,7 @@
       
 <template>
   <div class="Home">
-    <div class="Title">CreditWise</div>
+    <img class="logo" src="@/assets/logo.png" alt="" />
     <div class="select d-flex flex-row justify-space-between">
       <div>
         <div class="userName">{{ userName }}</div>
@@ -11,9 +11,10 @@
         </div>
       </div>
       <div class="filter ">
-         <img src="@/assets/refresh.png" class="mr-2 mt-4" v-if="canClick" style="width: 30px; height: 30px;" alt="" @click="Reload" />
-         <div class="second mr-2 mt-4" v-if="!canClick">{{ second }}</div>
+       
         <Select @chainChange="ChainChange" />
+          <img src="@/assets/refresh.png" class="ml-2 mb-1"  :class="[rotate ? 'go' : '']"  style="width: 30px; height: 30px;" alt="" @click="Reload" />
+         
       </div>
     </div>
     <div class="Form mt-5 d-flex align-center">
@@ -22,7 +23,7 @@
     </div>
     <div class="nftlist d-flex flex-row mt-5" v-if="NftList.length > 0">
       <div class="left">
-        <div class="listItem d-flex flex-column" v-for="(item, index) in NftList" :key="index" @click="itemClick(item)">
+        <div class="listItem d-flex flex-column" :class="selectId == index ? 'selectItem':''" v-for="(item, index) in NftList" :key="index" @click="itemClick(item,index)">
           <div class="d-flex flex-row align-center">
             <img class="img ml-5" :src="item.imgUrl" alt="" />
             <div class="Nftname ml-4">
@@ -33,7 +34,7 @@
           <div class="line mt-4"></div>
         </div>
       </div>
-      <div class="right">
+      <div class="right ml-2">
         <div class="contant d-flex flex-column">
           <div class="baseInfo d-flex flex-row align-center">
             <img :src="crossSrc" class="ava" alt="" />
@@ -78,11 +79,13 @@ import { getIirsAccoutInfo } from "../keplr/iris/wallet";
 import { getMyCardList,updateUser } from "@/api/home";
 import { iris2Uptick } from "/src/keplr/uptick/wallet"
 import { getNftImg } from "/src/api/image";
+import { keplrKeystoreChange } from "../keplr/index";
 export default {
   name: "crossChain",
   components: { Select },
   data() {
     return {
+       rotate:false,
       isPay:false,
       userName: "",
       NftList: [
@@ -91,9 +94,8 @@ export default {
       crossName: '',
       crossSrc: '',
       selectItem: {},
-      canClick: true,
-      second: 10,
-      timer: null,
+    
+      selectId:0
     };
   },
   filters: {},
@@ -101,11 +103,15 @@ export default {
     localStorage.setItem("selectChain", "IRISnet");
   },
   async mounted() {
+     window.addEventListener("keplr_keystorechange", keplrKeystoreChange);
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
     this.getMyList();
   },
   methods: {
+    keplrKeystoreChange() {
+      keplrKeystoreChange();
+    },
     async getMyList() {
       let params = {
         owner: this.$store.state.IrisAddress,
@@ -121,21 +127,11 @@ export default {
       }
      
     },
-    async Reload() {
-      if (!this.canClick) {
-        return;
-      }
-      this.canClick = false;
-      this.timer = setInterval(() => {
-        this.second--;
-        if (this.second === 0) {
-          clearInterval(this.timer);
-          this.canClick = true;
-          this.second = 10;
-        }
-      }, 1000);
-
-      let params = {
+   
+    async Reload(){
+     this.rotate=true;
+     setTimeout(() => { this.rotate=false }, 10000);
+       let params = {
         //this.$store.state.uptickAddress,this.$store.state.IrisAddress
          owner: this.$store.state.IrisAddress,
       };
@@ -143,7 +139,8 @@ export default {
       console.log(result)
        this.NftList =[]
       await this.getMyList();
-
+    
+     
     },
     ChainChange(chainId) {
       console.log("ChainChange", chainId);
@@ -154,6 +151,7 @@ export default {
       localStorage.clear();
       this.$store.commit("SET_DID", "");
       this.$store.commit("SET_UPTICK_DID", "");
+        this.$store.commit("SET_EVM_DID", "");
       this.$router.push({ name: "Home" });
     },
     async submit() {
@@ -173,25 +171,29 @@ export default {
  
 
     },
-    itemClick(item) {
+    itemClick(item,index) {
       console.log("item", item);
       this.crossName = item.name
       this.crossSrc = item.imgUrl
       this.selectItem = item
+      this.selectId = index
     }
   },
 };
 </script>
   <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang='scss' scoped>
-.Title {
-  font-family: "MuseoModerno-Regular";
-  font-size: 50px;
-  font-weight: normal;
-  font-stretch: normal;
-  line-height: 70px;
-  letter-spacing: 0px;
-  color: #54df62;
+.go {
+      transform: rotate(360deg);
+      transition: all 10s;
+      pointer-events: none;
+      user-select: none;
+    }
+
+
+.logo{
+  width: 255px;
+	height: 38px;
 }
 
 .select {
@@ -273,20 +275,30 @@ export default {
 .nftlist {
   width: 100%;
   margin-bottom: 135px;
-
+// .left:hover {
+//     // overflow-y: auto;
+//     // scrollbar-width: thin;
+//     overflow-y: scroll;
+//     scrollbar-color: transparent transparent;
+//     scrollbar-track-color: transparent;
+//     -ms-scrollbar-track-color: transparent;
+//   }
   .left {
     width: 74%;
     height: 598px;
     overflow-y: auto;
-
+  .selectItem{
+    background: #1d0952;
+  }
     .listItem {
+      width: 99%;
       &:hover {
         background: #1d0952;
       }
 
       .line {
         width: 100%;
-        height: 1px;
+        height: 0.5px;
         border: solid 1px #611ecd;
       }
 
@@ -450,6 +462,7 @@ export default {
 
 ::-webkit-scrollbar {
   width: 4px;
+  scroll-margin-left:10px;
   /* 设置滚动条宽度 */
 }
 

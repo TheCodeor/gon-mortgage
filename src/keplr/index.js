@@ -1,5 +1,7 @@
 import store from "../store/index.js"
 import { getIirsAccoutInfo } from "./iris/wallet";
+// import { getEvmAddress } from "../../keplr/uptick/wallet";
+import { getEvmAddress } from "./uptick/wallet";
    
    async function addIRISNetwork() { 
     if (!window.getOfflineSigner || ! window.keplr) {
@@ -219,6 +221,10 @@ export const keplrKeystoreChange = async () => {
     let uptickAccount = await getkeplrUptickAddress();
   store.commit("SET_UPTICK_DID", uptickAccount.toLowerCase());
   let accountInfo =  await getIirsAccoutInfo();
+
+  //getEvmAddress
+  let EvmAddress = getEvmAddress(uptickAccount)
+  store.commit("SET_EVM_DID", EvmAddress.toLowerCase());
   localStorage.setItem('userInfo',JSON.stringify(accountInfo))
   location.reload();
 

@@ -1,12 +1,12 @@
       
 <template>
   <div class="Home">
-    <div class="Title">CreditWise</div>
+     <img class="logo" src="@/assets/logo.png" alt="" />
     <div class="select d-flex flex-row justify-space-between">
       <div>
         <div class="userName">{{ userName }}</div>
         <div class="address">
-          {{ $store.state.IrisAddress }}
+          {{ $store.state.EvmAddress }}
           <button class="btn ml-9" @click="disconnect">Disconnect</button>
         </div>
       </div>
@@ -30,7 +30,7 @@
                 class="d-flex flex-row align-center nfts"
                 :class="{ opacitys: item.status == '3' }"
               >
-                <img class="img ml-5" :src="item.imgUrl" alt="" />
+                <img class="img ml-5 mb-4" :src="item.imgUrl" alt="" />
                 <div class="Nftname ml-4">
                   {{ item.name }}
                 </div>
@@ -79,12 +79,12 @@
               />
             </div>
 
-            <div class="line mt-4"></div>
+            <div class="line "></div>
           </div>
         </div>
       </div>
       <!-- 质押操作 -->
-      <div class="right" v-if="status == 0 || status == null">
+      <div class="right ml-2" v-if="(status == 0 || status == null) && NftList.length >0">
         <div class="contant d-flex flex-column">
           <div class="title">Mortgage</div>
           <div class="baseInfo d-flex flex-row align-center">
@@ -280,6 +280,7 @@ import {
 import { getPrice } from "../keplr/contract/handle/Quotation";
 import { toShowValue, fromShowValue } from "../utils/helper";
 import { timestampToDate, timestampToDateTime } from "../utils/helper";
+import { keplrKeystoreChange } from "../keplr/index";
 
 export default {
   name: "pledge",
@@ -289,7 +290,7 @@ export default {
       isPay:false,
       handType: "redemption",
       userName: "",
-      status: "0",
+      status: 0,
       time_id: 0,
       isShow: false,
       isShowExplain: false,
@@ -307,6 +308,7 @@ export default {
     localStorage.setItem("selectChain", "Uptick-EVM");
   },
   async mounted() {
+     window.addEventListener("keplr_keystorechange", keplrKeystoreChange);
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
     await addNetwork();
@@ -315,6 +317,9 @@ export default {
     //  getRate();
   },
   methods: {
+       keplrKeystoreChange() {
+      keplrKeystoreChange();
+    },
     
     async mortgageClick(selectItem) {
 
@@ -344,6 +349,7 @@ export default {
           this.$toast("success", "Mortgage Success").then(() => {
             this.NftList = [];
             this.getMyList();
+            this.isPay =false
           });
         } else{
           this.$toast("error", "Mortgage Error");
@@ -352,6 +358,7 @@ export default {
       }
         
       } catch (error) {
+        
         this.$toast("error", "Mortgage Error");
          this.isPay =false
       }
@@ -368,12 +375,15 @@ export default {
       let list = listInfo.data.list;
       this.NftList = this.NftList.concat(list);
       this.NftList.forEach((e) => {
+        if (e.period) e.period = (Number(e.endTime)- Number(e.startTime))/ 86400;
         if (e.startTime) e.startTime = timestampToDate(e.startTime * 1000);
         if (e.endTime) e.endTime = timestampToDateTime(e.endTime * 1000);
-        if (e.period) e.period = e.period / 86400;
+        
       });
+      
       if (this.NftList.length > 0) {
         this.selectItem = this.NftList[0];
+         this.status =  this.NftList[0].status;
         let price = await getPrice(
           this.selectItem.nftAddress,
           this.selectItem.nftId
@@ -453,6 +463,7 @@ export default {
           this.$toast("success", "Redeem Success").then(() => {
             this.NftList = [];
             this.getMyList();
+             this.isPay =false
           });
         } else {
           this.$toast("error", "Ransom Error");
@@ -475,7 +486,6 @@ export default {
         this.selectItem.nftId
       );
       this.selectItem.price = toShowValue(price.toString());
-      console.log(item);
       this.status = item.status;
       if (this.status == 1) {
         this.handType = "redemption";
@@ -539,6 +549,7 @@ export default {
           this.$toast("success", "Renewal Success").then(() => {
             this.NftList = [];
             this.getMyList();
+            this.isPay = false
           });
         } else {
           this.$toast("error", "Ransom Error");
@@ -575,6 +586,7 @@ export default {
       localStorage.clear();
       this.$store.commit("SET_DID", "");
       this.$store.commit("SET_UPTICK_DID", "");
+      this.$store.commit("SET_EVM_DID", "");
       this.$router.push({ name: "Home" });
     },
   },
@@ -607,15 +619,11 @@ export default {
    margin-left: 10px;
    margin-top: 0px;
 }
-.Title {
-  font-family: "MuseoModerno-Regular";
-  font-size: 50px;
-  font-weight: normal;
-  font-stretch: normal;
-  line-height: 70px;
-  letter-spacing: 0px;
-  color: #54df62;
+.logo{
+  width: 255px;
+	height: 38px;
 }
+
 .title1 {
   text-align: center;
   font-family: "MuseoModerno-SemiBold";
@@ -700,7 +708,7 @@ export default {
         opacity: 0.3;
       }
       .listItem {
-        width: 100%;
+        width: 98.5%;
         .nfts {
           width: 30%;
           .img {
@@ -781,7 +789,7 @@ export default {
         }
         .line {
           width: 100%;
-          height: 1px;
+          height: 0.5px;
           border: solid 1px #611ecd;
         }
       }
@@ -1016,7 +1024,7 @@ export default {
         font-size: 14px;
         font-weight: normal;
         font-stretch: normal;
-        line-height: 21px;
+        line-height: 30px;
         letter-spacing: 0px;
         color: #ffffff;
       }
@@ -1185,6 +1193,7 @@ export default {
 }
 ::-webkit-scrollbar {
   width: 4px; /* 设置滚动条宽度 */
+
 }
 
 ::-webkit-scrollbar-thumb {
@@ -1270,6 +1279,7 @@ export default {
       }
       .Info {
         .leftItem {
+ 
           text-align: center;
           .Principal {
             height: 11px;

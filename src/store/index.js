@@ -10,6 +10,7 @@ export default new Vuex.Store({
    
     IrisAddress:'',
     UptickAddress:'',
+    EvmAddress:'',
     chainType:''
 	
   },
@@ -23,6 +24,10 @@ export default new Vuex.Store({
     },
     SET_CHAIN(state,type){
       state.chainType = type
+    },
+    SET_EVM_DID(state,did){
+      
+      state.EvmAddress = did
     }
     
   

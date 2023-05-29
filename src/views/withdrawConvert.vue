@@ -1,19 +1,19 @@
       
 <template>
   <div class="Home">
-    <div class="Title">CreditWise</div>
+     <img class="logo" src="@/assets/logo.png" alt="" />
     <div class="select d-flex flex-row justify-space-between">
       <div>
         <div class="userName">{{ userName }}</div>
         <div class="address">
-          {{ $store.state.IrisAddress }}
+          {{ $store.state.UptickAddress }}
           <button class="btn ml-9" @click="disconnect">Disconnect</button>
         </div>
       </div>
       <div class="filter">
-        <img src="@/assets/refresh.png" class="mr-2 mt-4" v-if="canClick" style="width: 30px; height: 30px;" alt="" @click="Reload" />
-         <div class="second mr-2 mt-4" v-if="!canClick">{{ second }}</div>
         <Select />
+         <img src="@/assets/refresh.png" class="ml-2 mb-1"  :class="[rotate ? 'go' : '']"  style="width: 30px; height: 30px;" alt="" @click="Reload" />
+     
       </div>
     </div>
     <div class="Form mt-5 d-flex align-center">
@@ -24,7 +24,7 @@
       <div class="left">
         <div class="listItem d-flex flex-column" v-for="(item, index) in NftList" :key="index">
           <div class="d-flex flex-row align-center">
-            <img class="img ml-5" :src="item.imgUrl" alt="" />
+            <img class="img ml-5 mb-4" :src="item.imgUrl" alt="" />
             <div class="Nftname ml-4">
               {{ item.name }}
             </div>
@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <div class="line mt-4"></div>
+          <div class="line "></div>
         </div>
       </div>
     </div>
@@ -50,12 +50,14 @@ import Select from "../components/Select/index";
 import { getIirsAccoutInfo } from "../keplr/iris/wallet";
 import { getMyCardList,conventNFT,updateUser } from "@/api/home";
 import { uptick2Iris, convertCosmosNFT2ERC } from "/src/keplr/uptick/wallet"
+import { keplrKeystoreChange } from "../keplr/index";
 
 export default {
   name: "crossChain",
   components: { Select },
   data() {
     return {
+       rotate:false,
        isPay:false,
        selectItem:'',
        convertItem:'',
@@ -63,48 +65,42 @@ export default {
       NftList: [
 
       ],
-          canClick: true,
-      second: 10,
-      timer: null,
+   
     };
   },
   filters: {},
   created() {
     localStorage.setItem("selectChain", "Uptick-COSMOS");
   },
-  async mounted() {
+  async mounted() { 
+    window.addEventListener("keplr_keystorechange", keplrKeystoreChange);
     let accountInfo = await getIirsAccoutInfo();
     this.userName = accountInfo.name;
     this.getMyList();
   },
   methods: {
-     async Reload() {
-      if (!this.canClick) {
-        return;
-      }
-      this.canClick = false;
-      this.timer = setInterval(() => {
-        this.second--;
-        if (this.second === 0) {
-          clearInterval(this.timer);
-          this.canClick = true;
-          this.second = 10;
-        }
-      }, 1000);
-
-      let params = {
+     keplrKeystoreChange() {
+      keplrKeystoreChange();
+    },
+    
+     async Reload(){
+     this.rotate=true;
+     setTimeout(() => { this.rotate=false }, 10000);
+       let params = {
         //this.$store.state.uptickAddress,this.$store.state.IrisAddress
-         owner: this.$store.state.UptickAddress,
+         owner: this.$store.state.IrisAddress,
       };
       let result = await updateUser(params)
       console.log(result)
        this.NftList =[]
       await this.getMyList();
-
+    
+     
     },
     async getMyList() {
       let params = {
         owner: this.$store.state.UptickAddress,
+        // owner: 'uptick19cccaf8fu6w8xnttdkurkh3lngnt2ppzf6050n',
         chainType: 'origin_1170-1',
       }
       let listInfo = await getMyCardList(params);
@@ -114,8 +110,6 @@ export default {
     },
     async withdrowButtonClick(item,index) {
       this.selectItem = index
-      console.log("withdraw");
-      console.log(item)
       //跨回去iris
       try {
         this.isPay = true
@@ -131,8 +125,6 @@ export default {
     },
     async convertButtonClick(item,index) {
        this.convertItem = index
-      console.log("convert");
-      console.log(item)
       try {
            this.isPay = true
         let result = await convertCosmosNFT2ERC(item.nftAddress, item.nftId)
@@ -166,6 +158,7 @@ export default {
       localStorage.clear();
       this.$store.commit("SET_DID", "");
       this.$store.commit("SET_UPTICK_DID", "");
+      this.$store.commit("SET_EVM_DID", "");
       this.$router.push({ name: "Home" });
     },
   },
@@ -173,14 +166,15 @@ export default {
 </script>
   <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang='scss' scoped>
-.Title {
-  font-family: "MuseoModerno-Regular";
-  font-size: 50px;
-  font-weight: normal;
-  font-stretch: normal;
-  line-height: 70px;
-  letter-spacing: 0px;
-  color: #54df62;
+.go {
+      transform: rotate(360deg);
+      transition: all 10s;
+      pointer-events: none;
+      user-select: none;
+    }
+.logo{
+  width: 255px;
+	height: 38px;
 }
 
 .select {
@@ -275,16 +269,17 @@ export default {
 
       .line {
         width: 100%;
-        height: 1px;
+        height: 0.5px;
         border: solid 1px #611ecd;
       }
 
       .img {
-        width: 81px;
+        width: 8%;
         height: 81px;
         object-fit: cover;
         margin-top: 16px;
         border-radius: 5px;
+        background-size: 100% auto !important ;
       }
 
       .Nftname {
@@ -386,6 +381,7 @@ export default {
   background-color: #611ecd;
   /* 设置滚动条的颜色 */
   border-radius: 2px;
+
   /* 设置滚动条的圆角 */
 }
 

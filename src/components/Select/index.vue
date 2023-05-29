@@ -79,7 +79,7 @@ export default {
 .Select {
   position: relative;
   .filter {
-    width: 145px;
+    width: 160px;
     height: 41px;
     background-color: #4e1dc7;
     border-radius: 20px;

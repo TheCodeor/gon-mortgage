@@ -1,4 +1,4 @@
-import { connect,getGasPriceAndGasLimit } from "./base";
+import { connect,getGasPriceAndGasLimit,getRevertReason } from "./base";
 import {
     abi
 } from "../artifact/Pawnshop.json";
@@ -33,21 +33,33 @@ export async function getRate(period) {
 }
 //质押NFT
 export async function mortgageNft(tokenAddress,tokenId,period) {
-    debugger
-
-    // 判断是否授权
+    
+    try {
+          // 判断是否授权
     let isApproved = await isApprovedForAll(tokenAddress);
+    let setApproval,result
     if (!isApproved){
-        let setApproval= await setApprovalForAll(tokenAddress);
+         setApproval= await setApprovalForAll(tokenAddress);
         console.log('setApproval',setApproval);
     }
+    await sleep(8000).then(async () => {
+
         let contract  = await connect(contractAddress,abi)
-        let gasSetting = await getGasPriceAndGasLimit();
-		let result = await contract.pledge(
-            tokenAddress,tokenId,period
-        );
-        return result  
+        result = await contract.pledge(
+           tokenAddress,tokenId,period
+       );
+       return result
+    })
+     
+      
+    } catch (error) {
+        console.log(error); 
+    }
+   
 }
+ function sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+  }
 // 赎回NFT
 export async function redeemNft(tokenAddress,tokenId,amount) {
 
