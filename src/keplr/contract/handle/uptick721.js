@@ -11,7 +11,7 @@ import {
 const base = require('./base');
 
 //xxl todo get from .evn
-let contractAddress = "0x43be1f90567a0c55560a40912926b32050b490e4";
+let contractAddress = "0xf4164ece75bc4eebcce23f25c18132d54e405aa7";
 
 export async function isApprovedForAll(tokenAddress){
     const account = await getAccounts();

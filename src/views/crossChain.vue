@@ -13,8 +13,8 @@
       <div class="filter ">
        
         <Select @chainChange="ChainChange" />
-          <img src="@/assets/refresh.png" class="ml-2 mb-1"  :class="[rotate ? 'go' : '']"  style="width: 30px; height: 30px;" alt="" @click="Reload" />
-         
+        <img v-if="isShowFresh" src="@/assets/refresh.png" class="ml-2 mb-1"  :class="[rotate ? 'go' : '']"  style="width: 30px; height: 30px;" alt="" @click="Reload" />
+    
       </div>
     </div>
     <div class="Form mt-5 d-flex align-center">
@@ -85,6 +85,7 @@ export default {
   components: { Select },
   data() {
     return {
+      isShowFresh:true,
        rotate:false,
       isPay:false,
       userName: "",
@@ -130,8 +131,10 @@ export default {
    
     async Reload(){
      this.rotate=true;
-     setTimeout(() => { this.rotate=false }, 10000);
-       let params = {
+     this.isShowFresh = false
+     setTimeout(async () => { 
+       this.rotate=false
+        let params = {
         //this.$store.state.uptickAddress,this.$store.state.IrisAddress
          owner: this.$store.state.IrisAddress,
       };
@@ -139,6 +142,10 @@ export default {
       console.log(result)
        this.NftList =[]
       await this.getMyList();
+      this.isShowFresh = true
+     
+     }, 10000);
+     
     
      
     },
@@ -185,7 +192,7 @@ export default {
 <style lang='scss' scoped>
 .go {
       transform: rotate(360deg);
-      transition: all 10s;
+      transition: all 15s;
       pointer-events: none;
       user-select: none;
     }
@@ -298,8 +305,8 @@ export default {
 
       .line {
         width: 100%;
-        height: 0.5px;
-        border: solid 1px #611ecd;
+        height: 1px;
+        border: solid 0.5px #611ecd;
       }
 
       .img {
@@ -317,6 +324,9 @@ export default {
         line-height: 20px;
         letter-spacing: 0px;
         color: #ffffff;
+      
+
+
       }
     }
   }
@@ -341,6 +351,7 @@ export default {
         }
 
         .nftname {
+          width:80%;
           font-family: "MuseoModerno-Regular";
           font-size: 12px;
           font-weight: normal;
@@ -348,6 +359,18 @@ export default {
           line-height: 20px;
           letter-spacing: 0px;
           color: #ffffff;
+                   /* 1.溢出隐藏 */
+       overflow: hidden;
+       /* 2.用省略号来代替超出文本 */
+       text-overflow: ellipsis;
+       /* 3.设置盒子属性为-webkit-box  必须的 */
+       display: -webkit-box;
+       /* 4.-webkit-line-clamp 设置为2，表示超出2行的部分显示省略号，如果设置为3，那么就是超出3行部分显示省略号 */
+       -webkit-line-clamp: 3;
+       /* 5.字面意思：单词破坏：破坏英文单词的整体性，在英文单词还没有在一行完全展示时就换行  即一个单词可能会被分成两行展示 */
+       word-break: break-all;
+       /* 6.盒子实现多行显示的必要条件，文字是垂直展示，即文字是多行展示的情况下使用 */
+       -webkit-box-orient: vertical;
         }
       }
 

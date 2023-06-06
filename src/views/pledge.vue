@@ -28,7 +28,7 @@
             <div class="d-flex flex-row align-center">
               <div
                 class="d-flex flex-row align-center nfts"
-                :class="{ opacitys: item.status == '3' }"
+                :class="{ opacitys: item.status == '4' }"
               >
                 <img class="img ml-5 mb-4" :src="item.imgUrl" alt="" />
                 <div class="Nftname ml-4">
@@ -38,16 +38,16 @@
               <div
                 class="Mortgage"
                 v-if="item.status == 0 || item.status == null"
-                :class="{ opacitys: item.status == '3' }"
+                :class="{ opacitys: item.status == '4' }"
               >
                 Not Mortgaged
               </div>
               <div
                 class="Mortgage"
-                v-else-if="item.status == '1' || item.status == '2'"
-                :class="{ opacitys: item.status == '3' }"
+                v-else-if="item.status == '1' || item.status == '2' ||item.status == '4'  "
+                :class="{ opacitys: item.status == '4' }"
               >
-                {{ item.price }} UPTICK
+                {{ item.realityPrice }} UPTICK
               </div>
               <div class="time" :class="{ opacitys: item.status == '3' }">
                 {{ item.startTime }} ~ {{ item.endTime }} <br /><span
@@ -58,7 +58,7 @@
               <button
                 class="btn"
                 v-if="item.status == null || item.status == 0"
-                :class="{ opacitys: item.status == '3' }"
+                :class="{ opacitys: item.status == '4' }"
                 @click="Mortgage(item)"
               >
                 Mortgage
@@ -66,13 +66,13 @@
               <button
                 class="btn2"
                 v-else-if="item.status == '1' ||item.status == '2' "
-                :class="{ opacitys: item.status == '3' }"
+                :class="{ opacitys: item.status == '4' }"
                 @click="Mortgage(item)"
               >
                 Redeem
               </button>
               <img
-                v-else-if="item.status == '3'"
+                v-else-if="item.status == '4'"
                 class="faild"
                 src="@/assets/confiscated.png"
                 alt=""
@@ -131,14 +131,14 @@
               </div>
             </div>
             <div class="title mt-4">Mortgage Period</div>
-            <div class="title-25 mt-2">{{ selectItem.price }} UPTICK</div>
+            <div class="title-25 mt-2">{{ selectItem.realityPrice }} UPTICK</div>
             <div class="content">
               <div class="details">
                 <div class="title">Ransom</div>
                 <div class="Info d-flex flex-row align-center">
                   <div class="leftItem mt-2">
                     <div class="Principal">Principal</div>
-                    <div class="prices">{{ selectItem.price }} UPTICK</div>
+                    <div class="prices">{{ selectItem.realityPrice }} UPTICK</div>
                   </div>
 
                   <div class="mt-2 ml-7 mr-7" style="color: #ffffff">+</div>
@@ -174,7 +174,7 @@
           <div class="title-14 mt-5">Current Appraised Value :</div>
           <div class="price">{{ selectItem.price }} UPTICK</div>
           <div class="title-14 mt-5">Mortgage amount :</div>
-          <div class="price">{{ selectItem.price }}UPTICK</div>
+          <div class="price">{{ selectItem.realityPrice }}UPTICK</div>
           <div class="title-14 mt-5">Mortgage Period :</div>
           <div class="title-13 mt-3">
             {{ selectItem.startTime }} ~ {{ selectItem.endTime }}
@@ -189,7 +189,7 @@
                   <div class="Info d-flex flex-row align-center">
                     <div class="leftItem mt-4">
                       <div class="Principal">Principal</div>
-                      <div class="prices">{{ selectItem.price }} UPTICK</div>
+                      <div class="prices">{{ selectItem.realityPrice }} UPTICK</div>
                     </div>
 
                     <div class="mt-4 ml-7 mr-7" style="color: #ffffff">+</div>
@@ -233,14 +233,14 @@
                 </div>
               </div>
               <div class="title1 pt-4">Mortgage Period</div>
-              <div class="title-25 mt-2">{{selectItem.price}}UPTICK</div>
+              <div class="title-25 mt-2">{{selectItem.realityPrice}}UPTICK</div>
               <div class="content">
                 <div class="details">
                   <div class="title1">Ransom</div>
                   <div class="Info d-flex flex-row align-center">
                     <div class="leftItem mt-2">
                       <div class="Principal">Principal</div>
-                      <div class="prices">{{ selectItem.price }} UPTICK</div>
+                      <div class="prices">{{ selectItem.realityPrice }} UPTICK</div>
                     </div>
 
                     <div class="mt-2 ml-7 mr-7" style="color: #ffffff">+</div>
@@ -334,6 +334,7 @@ export default {
         selectItem.nftId,
         this.dayList[this.time_id].value
       );
+      console.log("mortgageNft",result);
       if (result.hash) {
         let params = {
           nftAddress: selectItem.nftAddress,
@@ -345,6 +346,9 @@ export default {
           period: this.dayList[this.time_id].value,
         };
         let infoResult = await pledgeNFT(params);
+        console.log("infoResult",infoResult);
+        debugger
+        
         if (infoResult.data.code == 0) {
           this.$toast("success", "Mortgage Success").then(() => {
             this.NftList = [];
@@ -358,13 +362,11 @@ export default {
       }
         
       } catch (error) {
-        
+
         this.$toast("error", "Mortgage Error");
          this.isPay =false
       }
       
-     
-
     },
     async getMyList() {
       let params = {
@@ -374,12 +376,13 @@ export default {
       let listInfo = await getMyCardList(params);
       let list = listInfo.data.list;
       this.NftList = this.NftList.concat(list);
-      this.NftList.forEach((e) => {
-        if (e.period) e.period = (Number(e.endTime)- Number(e.startTime))/ 86400;
-        if (e.startTime) e.startTime = timestampToDate(e.startTime * 1000);
-        if (e.endTime) e.endTime = timestampToDateTime(e.endTime * 1000);
+      // this.NftList.forEach((e) => {
+      //   if (e.period) e.period = (Number(e.endTime)- Number(e.startTime))/ 86400;
+      //   if (e.startTime) e.startTime = timestampToDate(e.startTime * 1000);
+      //   if (e.endTime) e.endTime = timestampToDateTime(e.endTime * 1000);
+      //    e.realityPrice = e.price
         
-      });
+      // });
       
       if (this.NftList.length > 0) {
         this.selectItem = this.NftList[0];
@@ -388,18 +391,34 @@ export default {
           this.selectItem.nftAddress,
           this.selectItem.nftId
         );
+        console.log('selectItem ====',price);
+        debugger
         this.selectItem.price = toShowValue(price.toString());
+        this.selectItem.realityPrice = this.NumberMul(Number( this.selectItem.price),Number(0.7))
         // 获取质押费率
         this.InterestFee = await getRate(this.dayList[this.time_id].value);
+   
         this.selectItem.fee = this.NumberMul(
           Number(this.InterestFee),
-          Number(this.selectItem.price)
+          Number(this.selectItem.realityPrice)
         );
+         if( this.selectItem.status == 2)
+          this.selectItem.fee = this.NumberMul( this.selectItem.fee,2)
         //获取总价
-        this.selectItem.total =
-          Number(this.selectItem.fee) + Number(this.selectItem.price);
+        this.selectItem.total =this.amend(Number(this.selectItem.fee),Number(this.selectItem.realityPrice),"+")
         this.$forceUpdate();
       }
+      this.NftList.forEach((e) => {
+        if (e.period) e.period = (Number(e.endTime)- Number(e.startTime))/ 86400;
+        if (e.startTime) e.startTime = timestampToDate(e.startTime * 1000);
+        if (e.endTime) e.endTime = timestampToDateTime(e.endTime * 1000);
+          e.realityPrice =  this.NumberMul(
+         Number(0.7),
+          Number(e.price)
+        );
+        
+      });
+    
     },
     NumberMul(arg1, arg2) {
       var m = 0;
@@ -425,18 +444,46 @@ export default {
         Math.pow(10, m)
       );
     },
+   amend(num1,num2,symbol){
+  var str1=num1.toString(),str2=num2.toString(),result,str1Length,str2Length
+    //解决整数没有小数点方法
+    try {str1Length= str1.split('.')[1].length} catch (error) {str1Length=0}
+    try {str2Length= str2.split('.')[1].length} catch (error) {str2Length=0}
+    var step=Math.pow(10,Math.max(str1Length,str2Length))
+    // 
+    console.log(step);
+    switch (symbol) {
+        case "+":
+            result= (num1*step+num2*step)/step
+            break;
+        case "-":
+            result= (num1*step-num2*step)/step
+            break;
+        case "*":
+            result= ((num1*step)*(num2*step)) / step/step
+            break;
+        case "/":
+            result= (num1*step)/(num2*step)
+            break;
+        default:
+            break;
+    }
+    return result
+    
+},
 
     async clickItem(index) {
       this.time_id = index;
       // 获取质押费率
       this.InterestFee = await getRate(this.dayList[this.time_id].value);
-      this.selectItem.fee = this.NumberMul(
-        Number(this.InterestFee),
-        Number(this.selectItem.price)
-      );
+    
+      this.selectItem.realityPrice = this.NumberMul(Number(this.selectItem.price),Number(0.7))
       //获取总价
-      this.selectItem.total =
-        Number(this.selectItem.fee) + Number(this.selectItem.price);
+        this.selectItem.fee = this.NumberMul(
+        Number(this.InterestFee),
+        Number(this.selectItem.realityPrice)
+      );
+     this.selectItem.total =this.amend(Number(this.selectItem.fee),Number(this.selectItem.realityPrice),"+")
       this.$forceUpdate();
     },
 
@@ -480,45 +527,53 @@ export default {
     },
     // 点击切换
     async Mortgage(item) {
+      console.log('item',item);
       this.selectItem = item;
       let price = await getPrice(
         this.selectItem.nftAddress,
         this.selectItem.nftId
       );
       this.selectItem.price = toShowValue(price.toString());
+      // this.selectItem.price =14
       this.status = item.status;
       if (this.status == 1) {
         this.handType = "redemption";
-       
         // 赎回获取Fee
         let result = await getPledgeInfo(item.nftAddress,item.nftId);
         console.log("result ", result);
 
         // 获取质押费率
-      this.InterestFee = parseInt(result._rate._hex,16)/1000;
-      let price =parseInt(result._value._hex,16)
-       price = toShowValue(price.toString())
+      // this.InterestFee = parseInt(result._rate._hex,16)/1000;
+      this.InterestFee = await getRate(this.dayList[this.time_id].value);
+      // let price = parseInt(result._value._hex,16)/0.7
+
+      let price  = this.amend(Number(parseInt(result._value._hex,16)),Number(0.7),"/")
+      price = toShowValue(price.toString())
        this.selectItem.price = price
       console.log("InterestFee", this.InterestFee,price);
-      debugger
+      this.selectItem.realityPrice = this.NumberMul(Number(this.selectItem.price),Number(0.7))
       this.selectItem.fee = this.NumberMul(
         Number(this.InterestFee),
-       price
+       this.selectItem.realityPrice
       );
+       if( this.selectItem.status == 2)
+          this.selectItem.fee = this.NumberMul( this.selectItem.fee,2)
+   
       // 获取总价
-      this.selectItem.total =
-        Number(this.selectItem.fee) + Number(price);
+      this.selectItem.total =this.amend(Number(this.selectItem.fee),Number(this.selectItem.realityPrice),"+")
       this.$forceUpdate();
       }else{
           // 获取质押费率
       this.InterestFee = await getRate(this.dayList[this.time_id].value);
+       this.selectItem.realityPrice = this.NumberMul(Number(this.selectItem.price),Number(0.7))
       this.selectItem.fee = this.NumberMul(
         Number(this.InterestFee),
-        Number(this.selectItem.price)
+        Number(this.selectItem.realityPrice)
       );
+       if( this.selectItem.status == 2)
+          this.selectItem.fee = this.NumberMul( this.selectItem.fee,2)
       // 获取总价
-      this.selectItem.total =
-        Number(this.selectItem.fee) + Number(this.selectItem.price);
+      this.selectItem.total =this.amend(Number(this.selectItem.fee),Number(this.selectItem.realityPrice),"+")
       this.$forceUpdate();
       }
 
@@ -547,6 +602,7 @@ export default {
            console.log(renewal);
             if (renewal.data.code == 0) {
           this.$toast("success", "Renewal Success").then(() => {
+              this.handType = "redemption";
             this.NftList = [];
             this.getMyList();
             this.isPay = false
@@ -569,7 +625,7 @@ export default {
       this.handType = "renew";
       setTimeout(()=>{
           this.selectItem.fee = this.selectItem.fee *2
-          this.selectItem.total = Number(this.selectItem.fee) + Number(this.selectItem.price)
+          this.selectItem.total =this.amend(Number(this.selectItem.fee),Number(this.selectItem.realityPrice),"+")
           this.$forceUpdate()
       },500)
     },
@@ -789,8 +845,8 @@ export default {
         }
         .line {
           width: 100%;
-          height: 0.5px;
-          border: solid 1px #611ecd;
+          height: 1px;
+          border: solid 0.5px #611ecd;
         }
       }
     }
@@ -884,6 +940,7 @@ export default {
         color: #54df62;
       }
       .help {
+        cursor: pointer;
         width: 100%;
         display: flex;
         justify-content: center;

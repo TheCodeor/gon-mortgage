@@ -1,7 +1,7 @@
       
 <template>
   <div class="Home">
-     <img class="logo" src="@/assets/logo.png" alt="" />
+    <img class="logo" src="@/assets/logo.png" alt="" />
     <div class="select d-flex flex-row justify-space-between">
       <div>
         <div class="userName">{{ userName }}</div>
@@ -12,8 +12,15 @@
       </div>
       <div class="filter">
         <Select />
-         <img src="@/assets/refresh.png" class="ml-2 mb-1"  :class="[rotate ? 'go' : '']"  style="width: 30px; height: 30px;" alt="" @click="Reload" />
-     
+        <img
+        v-if="isShowFresh"
+          src="@/assets/refresh.png"
+          class="ml-2 mb-1"
+          :class="[rotate ? 'go' : '']"
+          style="width: 30px; height: 30px"
+          alt=""
+          @click="Reload"
+        />
       </div>
     </div>
     <div class="Form mt-5 d-flex align-center">
@@ -22,21 +29,29 @@
     </div>
     <div class="nftlist d-flex flex-row mt-5">
       <div class="left">
-        <div class="listItem d-flex flex-column" v-for="(item, index) in NftList" :key="index">
+        <div
+          class="listItem d-flex flex-column"
+          v-for="(item, index) in NftList"
+          :key="index"
+        >
           <div class="d-flex flex-row align-center">
             <img class="img ml-5 mb-4" :src="item.imgUrl" alt="" />
             <div class="Nftname ml-4">
               {{ item.name }}
             </div>
-            <div class="withdraw"  @click="withdrowButtonClick(item,index)">
-              <div  :class="index === selectItem ?'sub-dis' : ''">Withdraw to IRISnet</div>
+            <div class="withdraw" @click="withdrowButtonClick(item, index)">
+              <div :class="index === selectItem ? 'sub-dis' : ''">
+                Withdraw to IRISnet
+              </div>
             </div>
-            <div class="convert"  @click="convertButtonClick(item,index)">
-              <div :class="index === convertItem ?'sub-dis' : ''">Convert to Uptick-EVM</div>
+            <div class="convert" @click="convertButtonClick(item, index)">
+              <div :class="index === convertItem ? 'sub-dis' : ''">
+                Convert to Uptick-EVM
+              </div>
             </div>
           </div>
 
-          <div class="line "></div>
+          <div class="line"></div>
         </div>
       </div>
     </div>
@@ -57,6 +72,7 @@ export default {
   components: { Select },
   data() {
     return {
+      isShowFresh:true,
        rotate:false,
        isPay:false,
        selectItem:'',
@@ -85,15 +101,21 @@ export default {
     
      async Reload(){
      this.rotate=true;
-     setTimeout(() => { this.rotate=false }, 10000);
-       let params = {
+     this.isShowFresh = false
+     setTimeout( async () => { 
+       this.rotate=false 
+     
+        let params = {
         //this.$store.state.uptickAddress,this.$store.state.IrisAddress
-         owner: this.$store.state.IrisAddress,
+         owner: this.$store.state.UptickAddress,
       };
       let result = await updateUser(params)
       console.log(result)
        this.NftList =[]
       await this.getMyList();
+      this.isShowFresh =true
+      }, 10000);
+    
     
      
     },
@@ -167,32 +189,31 @@ export default {
   <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang='scss' scoped>
 .go {
-      transform: rotate(360deg);
-      transition: all 10s;
-      pointer-events: none;
-      user-select: none;
-    }
-.logo{
+  transform: rotate(360deg);
+  transition: all 15s;
+  pointer-events: none;
+  user-select: none;
+}
+.logo {
   width: 255px;
-	height: 38px;
+  height: 38px;
 }
 
 .select {
   .filter {
     display: flex;
     align-items: flex-end;
-       .second {
-  padding-top: 5px;
-  background-color: #611ecd;
-  color: #fb599b;
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
-  text-align: center;
-  font-family: "AmpleSoft" !important;
-   font-size: 15px !important;
-
-}
+    .second {
+      padding-top: 5px;
+      background-color: #611ecd;
+      color: #fb599b;
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      text-align: center;
+      font-family: "AmpleSoft" !important;
+      font-size: 15px !important;
+    }
   }
 
   .userName {
@@ -269,8 +290,8 @@ export default {
 
       .line {
         width: 100%;
-        height: 0.5px;
-        border: solid 1px #611ecd;
+        height: 1px;
+        border: solid 0.5px #611ecd;
       }
 
       .img {
@@ -311,33 +332,28 @@ export default {
         margin-right: 20px;
       }
       .sub-dis {
-    position: relative;
-    pointer-events: none;
-    background-image: linear-gradient(
-      #766983, 
-      #766983), 
-     linear-gradient(
-      #270645, 
-      #270645) !important;
-     background-blend-mode: normal, 
-      normal;
-     border-radius: 25px;
-     opacity: 0.9;
-}
-.sub-dis::after {
-    content: "";
-    background-image: url(../assets/loading.gif);
-    background-size: 100%;
-    display: inline-block;
-    position: absolute;
-    width: 15px;
-    height: 15px;
-   margin-left: 5px;
-   margin-top: 10px;
-}
+        position: relative;
+        pointer-events: none;
+        background-image: linear-gradient(#766983, #766983),
+          linear-gradient(#270645, #270645) !important;
+        background-blend-mode: normal, normal;
+        border-radius: 25px;
+        opacity: 0.9;
+      }
+      .sub-dis::after {
+        content: "";
+        background-image: url(../assets/loading.gif);
+        background-size: 100%;
+        display: inline-block;
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        margin-left: 5px;
+        margin-top: 10px;
+      }
 
       .convert {
-         cursor: pointer;
+        cursor: pointer;
         width: 240px;
         height: 33px;
         background-color: #54df62;

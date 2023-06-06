@@ -4,7 +4,7 @@ import {
 } from "../artifact/Pawnshop.json";
 import { isApprovedForAll,setApprovalForAll } from "./uptick721";
 
-let contractAddress = '0x43be1f90567a0c55560a40912926b32050b490e4'
+let contractAddress = '0xf4164ece75bc4eebcce23f25c18132d54e405aa7'
 
 
 //设置合约地址
@@ -48,10 +48,10 @@ export async function mortgageNft(tokenAddress,tokenId,period) {
         result = await contract.pledge(
            tokenAddress,tokenId,period
        );
-       return result
+      
     })
      
-      
+    return result 
     } catch (error) {
         console.log(error); 
     }
@@ -62,16 +62,21 @@ export async function mortgageNft(tokenAddress,tokenId,period) {
   }
 // 赎回NFT
 export async function redeemNft(tokenAddress,tokenId,amount) {
+    try {
+        console.log('redeemNft',tokenAddress,tokenId,amount,contractAddress);
+        debugger
+        let contract  = await connect(contractAddress,abi)
+        let gasSetting = await getGasPriceAndGasLimit();
+        let result = await contract.redeem(
+            tokenAddress,tokenId,
+            { value:amount,gasPrice: gasSetting.gasPrice, gasLimit: gasSetting.gasLimit }
+        );
+        return result   
+    } catch (error) {
+        console.log(error);
+    }
 
-    console.log('redeemNft',tokenAddress,tokenId,amount,contractAddress);
-    debugger
-    let contract  = await connect(contractAddress,abi)
-    let gasSetting = await getGasPriceAndGasLimit();
-    let result = await contract.redeem(
-        tokenAddress,tokenId,
-        { value:amount,gasPrice: gasSetting.gasPrice, gasLimit: gasSetting.gasLimit }
-    );
-    return result  
+  
 }
 
 //延期
