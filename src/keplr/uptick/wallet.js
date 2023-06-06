@@ -50,7 +50,7 @@ export async function convertCosmosNFT2ERC(denomId, nftId) {
                 "",
                 ""]
         }
-        const result = await sendMsgsTx(uptickAddress, [msg], 1000000, "0x1234");
+        const result = await sendMsgsTx(uptickAddress, [msg], 1000000, "");
         result.evmAddress = evmAddress
         result.uptickAddress = uptickAddress
         console.log(result)
@@ -66,7 +66,7 @@ export async function convertCosmosNFT2ERC(denomId, nftId) {
         console.log(error)
         throw new Error(error)
     }
-    // const result = await sendMsgsTx(uptickAccount.bech32Address, [msg], 1000000, "0x1234");
+    // const result = await sendMsgsTx(uptickAccount.bech32Address, [msg], 1000000, "");
     // if (result.code == 0) {
     //     alert("successful ! ");
     //     const logInfo = JSON.parse(result.rawLog)
@@ -101,7 +101,7 @@ export async function convertERC2CosmosNFT(typeUrl, classId, nftId, sender, rece
             nftId]
     }
 
-    const result = await sendMsgsTx(account.bech32Address, [msg], 1000000, "0x1234");
+    const result = await sendMsgsTx(account.bech32Address, [msg], 1000000, "");
     if (result.code == 0) {
         alert("successful ! ");
         const logInfo = JSON.parse(result.rawLog)
@@ -309,7 +309,7 @@ export async function issueUptickDenomAndMint(
 
     console.log("xxl --- msgs");
     console.log(msgs);
-    const result = await sendMsgsTx(accountInfo.bech32Address, msgs, 1000000, "0x1234");
+    const result = await sendMsgsTx(accountInfo.bech32Address, msgs, 1000000, "");
     if (result.code == 0) {
         alert("successful ! ");
     }
